@@ -1,0 +1,5 @@
+cmake_minimum_required(VERSION 2.8.9)
+project (sago_multi_scrambler_puzzle2)
+find_package(Boost COMPONENTS program_options REQUIRED)
+add_executable(sago_multi_scrambler_puzzle2 src/sago_multi_scrambler_puzzle2.cpp)
+TARGET_LINK_LIBRARIES( sago_multi_scrambler_puzzle2 ${Boost_LIBRARIES} )

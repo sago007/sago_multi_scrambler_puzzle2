@@ -1,0 +1,10 @@
+CMakeCache.txt  
+CMakeFiles
+*~
+*.bak
+*.exe
+*.so
+*.dll
+*.cmake
+Makefile
+sago_multi_scrambler_puzzle2
