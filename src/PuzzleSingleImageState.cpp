@@ -21,33 +21,29 @@ https://github.com/sago007/saland
 ===========================================================================
 */
 
-#ifndef GLOBALS_HPP
-#define GLOBALS_HPP
+#include "PuzzleSingleImageState.hpp"
 
-#include "sago/SagoSpriteHolder.hpp"
-#include <memory>
+PuzzleSingleImageState::PuzzleSingleImageState() {
+	
+}
+
+PuzzleSingleImageState::~PuzzleSingleImageState() {
+
+}
+
+bool PuzzleSingleImageState::IsActive() {
+    return true;
+}
+
+void PuzzleSingleImageState::ProcessInput(const SDL_Event& event, bool &processed) {
+
+}
+
+void PuzzleSingleImageState::Draw(SDL_Renderer* target) {
+
+}
 
 
-struct GlobalData {
-	bool isShuttingDown = false;
-	bool fullscreen = false;
-	bool resetVideo = false;
-	bool SoundEnabled = true;
-	bool NoSound = false;
-	SDL_Renderer* screen = nullptr;
-	std::unique_ptr<sago::SagoSpriteHolder> spriteHolder;
-	sago::SagoDataHolder* dataHolder;
-	sago::SagoSprite mouse;
-	int verboseLevel = 0;
-	int mousex = 0;
-	int mousey = 0;
-	int xsize = 1024;
-	int ysize = 768;
-};
+void PuzzleSingleImageState::Update() {
 
-const char* const GAMENAME = "Sago's Multi Scrambler Puzzle II";
-
-extern GlobalData globalData;
-
-#endif /* GLOBALS_HPP */
-
+}

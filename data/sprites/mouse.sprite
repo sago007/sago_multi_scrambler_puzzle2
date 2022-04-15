@@ -1,0 +1,12 @@
+{
+"_comment": "File with the mouse image",
+"mouse" : {
+	"texture" : "mouse",
+ 	"topx" : 0,
+	"topy" : 0,
+	"height" : 32,
+	"width" : 32,
+	"number_of_frames" : 1,
+	"frame_time" : 1
+}
+}

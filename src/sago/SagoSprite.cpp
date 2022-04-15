@@ -81,6 +81,7 @@ void SagoSprite::DrawScaled(SDL_Renderer* target, Sint32 frameTime, int x, int y
 void SagoSprite::DrawScaledAndRotated(SDL_Renderer* target, Sint32 frameTime, int x, int y, int w, int h, const double angleRadian, const SDL_Point* center, const SDL_RendererFlip flip) const {
 	if (!data->tex.get()) {
 		std::cerr << "Texture is null!\n";
+		return;
 	}
 	SDL_Rect rect = data->imgCord;
 	rect.x+=rect.w*((frameTime/data->aniFrameTime)%data->aniFrames);

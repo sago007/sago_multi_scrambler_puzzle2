@@ -21,33 +21,25 @@ https://github.com/sago007/saland
 ===========================================================================
 */
 
-#ifndef GLOBALS_HPP
-#define GLOBALS_HPP
+#include "sago/GameStateInterface.hpp"
 
-#include "sago/SagoSpriteHolder.hpp"
-#include <memory>
+#ifndef MAINGAMESTATE_HPP
+#define MAINGAMESTATE_HPP
 
+class MainGameState : public sago::GameStateInterface {
+public:
+	MainGameState();
+	MainGameState(const MainGameState& orig) = delete;
+	virtual ~MainGameState();
+	
+	bool IsActive() override;
+	void ProcessInput(const SDL_Event& event, bool &processed) override;
+	void Draw(SDL_Renderer* target) override;
+	void Update() override;
 
-struct GlobalData {
-	bool isShuttingDown = false;
-	bool fullscreen = false;
-	bool resetVideo = false;
-	bool SoundEnabled = true;
-	bool NoSound = false;
-	SDL_Renderer* screen = nullptr;
-	std::unique_ptr<sago::SagoSpriteHolder> spriteHolder;
-	sago::SagoDataHolder* dataHolder;
-	sago::SagoSprite mouse;
-	int verboseLevel = 0;
-	int mousex = 0;
-	int mousey = 0;
-	int xsize = 1024;
-	int ysize = 768;
+private:
+	bool isActive = true;
 };
 
-const char* const GAMENAME = "Sago's Multi Scrambler Puzzle II";
-
-extern GlobalData globalData;
-
-#endif /* GLOBALS_HPP */
+#endif /* MAINGAMESTATE_HPP */
 
