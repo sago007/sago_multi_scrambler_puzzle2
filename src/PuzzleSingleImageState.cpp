@@ -22,13 +22,15 @@ https://github.com/sago007/saland
 */
 
 #include "PuzzleSingleImageState.hpp"
+#include "SDL_image.h"
+#include <iostream>
 
 PuzzleSingleImageState::PuzzleSingleImageState() {
 	
 }
 
 PuzzleSingleImageState::~PuzzleSingleImageState() {
-
+	ClearPicture();
 }
 
 bool PuzzleSingleImageState::IsActive() {
@@ -40,10 +42,29 @@ void PuzzleSingleImageState::ProcessInput(const SDL_Event& event, bool &processe
 }
 
 void PuzzleSingleImageState::Draw(SDL_Renderer* target) {
-
+	SDL_RenderCopy(target, this->pictureTex, NULL, NULL);
 }
 
 
 void PuzzleSingleImageState::Update() {
 
+}
+
+void PuzzleSingleImageState::LoadPictureFromFile(const std::string& filename, SDL_Renderer* renderer) {
+	ClearPicture();
+	IMG_Init(IMG_INIT_JPG|IMG_INIT_PNG);
+	SDL_Surface* bitmapSurface = IMG_Load(filename.c_str());
+	if (!bitmapSurface) {
+		std::cerr << "Failed to load " << filename << std::endl;
+		return;
+	}
+	this->pictureTex = SDL_CreateTextureFromSurface(renderer, bitmapSurface);
+	SDL_FreeSurface(bitmapSurface);
+}
+
+void PuzzleSingleImageState::ClearPicture() {
+	if (this->pictureTex) {
+		SDL_DestroyTexture(this->pictureTex);
+		this->pictureTex = nullptr;
+	}
 }

@@ -22,6 +22,8 @@ https://github.com/sago007/saland
 */
 
 #include "sago/GameStateInterface.hpp"
+#include "SDL.h"
+#include <string>
 
 class PuzzleSingleImageState : public sago::GameStateInterface {
 public:
@@ -34,6 +36,10 @@ public:
 	void Draw(SDL_Renderer* target) override;
 	void Update() override;
 
+	void LoadPictureFromFile(const std::string& filename, SDL_Renderer* renderer);
 private:
+	void ClearPicture();
+
 	bool isActive = true;
+	SDL_Texture* pictureTex = NULL;
 };

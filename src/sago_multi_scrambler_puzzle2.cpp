@@ -42,6 +42,7 @@ GlobalData globalData;
 void runSinglePuzzle(const std::string& filename) {
 	PuzzleSingleImageState psi;
 	InitGame();
+	psi.LoadPictureFromFile(filename, globalData.screen);
 	RunGameState(psi);
 	UninitGame();
 }
