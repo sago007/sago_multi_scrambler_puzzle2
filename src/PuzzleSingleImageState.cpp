@@ -42,7 +42,12 @@ void PuzzleSingleImageState::ProcessInput(const SDL_Event& event, bool &processe
 }
 
 void PuzzleSingleImageState::Draw(SDL_Renderer* target) {
-	SDL_RenderCopy(target, this->pictureTex, NULL, NULL);
+	SDL_Rect rect;
+	rect.x = 0;
+	rect.y = 0;
+	rect.h = resized_image_height;
+	rect.w = resized_image_width;
+	SDL_RenderCopy(target, this->pictureTex, &rect, NULL);
 }
 
 
@@ -58,7 +63,11 @@ void PuzzleSingleImageState::LoadPictureFromFile(const std::string& filename, SD
 		std::cerr << "Failed to load " << filename << std::endl;
 		return;
 	}
+	source_image_height = bitmapSurface->h;
+	source_image_width = bitmapSurface->w;
+	resized_image_width = double(resized_image_height) * (double(source_image_width)/double(source_image_height));
 	this->pictureTex = SDL_CreateTextureFromSurface(renderer, bitmapSurface);
+	std::cerr << resized_image_width << ", " << resized_image_height << "\n";
 	SDL_FreeSurface(bitmapSurface);
 }
 

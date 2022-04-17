@@ -42,4 +42,8 @@ private:
 
 	bool isActive = true;
 	SDL_Texture* pictureTex = NULL;
+	int source_image_height = 1;
+	int source_image_width = 1;
+	const int resized_image_height = 700;
+	int resized_image_width = 1;
 };

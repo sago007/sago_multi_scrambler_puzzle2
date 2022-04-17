@@ -111,6 +111,7 @@ void InitGame() {
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
 	win = SDL_CreateWindow(GAMENAME, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_WINDOW_RESIZABLE);
 	globalData.screen = SDL_CreateRenderer(win, -1, rendererFlags);
+	SDL_RenderSetLogicalSize(globalData.screen, globalData.xsize, globalData.ysize);
 	
 	dataHolder.invalidateAll(globalData.screen);
 	globalData.spriteHolder.reset(new sago::SagoSpriteHolder(dataHolder));
