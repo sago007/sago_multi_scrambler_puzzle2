@@ -41,7 +41,7 @@ struct GlobalData {
 	int verboseLevel = 0;
 	int mousex = 0;
 	int mousey = 0;
-	int xsize = 1024;
+	int xsize = 1366;
 	int ysize = 768;
 };
 

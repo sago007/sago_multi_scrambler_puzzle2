@@ -100,7 +100,7 @@ sago::SagoDataHolder dataHolder;
 static SDL_Window* win = nullptr;
 
 void InitGame() {
-	int width = 1280, height = 720;
+	int width = globalData.xsize, height = globalData.ysize;
 	SDL_Init(SDL_INIT_VIDEO);
 	IMG_Init(IMG_INIT_PNG);
 	TTF_Init();

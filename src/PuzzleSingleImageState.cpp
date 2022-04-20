@@ -24,6 +24,7 @@ https://github.com/sago007/saland
 #include "PuzzleSingleImageState.hpp"
 #include "SDL_image.h"
 #include <iostream>
+#include "globals.hpp"
 
 PuzzleSingleImageState::PuzzleSingleImageState() {
 	
@@ -43,11 +44,11 @@ void PuzzleSingleImageState::ProcessInput(const SDL_Event& event, bool &processe
 
 void PuzzleSingleImageState::Draw(SDL_Renderer* target) {
 	SDL_Rect rect;
-	rect.x = 0;
-	rect.y = 0;
+	rect.x = globalData.xsize/2-resized_image_width/2;
+	rect.y = globalData.ysize/2-resized_image_height/2;;
 	rect.h = resized_image_height;
 	rect.w = resized_image_width;
-	SDL_RenderCopy(target, this->pictureTex, &rect, NULL);
+	SDL_RenderCopy(target, this->pictureTex, NULL, &rect);
 }
 
 
