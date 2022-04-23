@@ -24,6 +24,7 @@ https://github.com/sago007/saland
 #include "sago/GameStateInterface.hpp"
 #include "SDL.h"
 #include <string>
+#include <vector>
 
 class PuzzleSingleImageState : public sago::GameStateInterface {
 public:
@@ -37,6 +38,11 @@ public:
 	void Update() override;
 
 	void LoadPictureFromFile(const std::string& filename, SDL_Renderer* renderer);
+
+        void SplitPiece();
+        void SplitPiece(size_t piece_number);
+        void SplitPieceVertical(size_t piece_number);
+        void SplitPieceHorisontal(size_t piece_number);
 private:
 	void ClearPicture();
 
@@ -46,4 +52,6 @@ private:
 	int source_image_width = 1;
 	const int resized_image_height = 700;
 	int resized_image_width = 1;
+        std::vector<SDL_Rect> pieces;
+        int min_piece_size = 140;
 };
