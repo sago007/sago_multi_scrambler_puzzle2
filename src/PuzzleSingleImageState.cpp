@@ -67,15 +67,51 @@ void PuzzleSingleImageState::Draw(SDL_Renderer* target) {
 		source.h = double(source.h)*scale;
 		SDL_RenderCopy(target, this->pictureTex, &source, &destination);
 	}
-	for (const SDL_Rect& piece : pieces) {
+	for (size_t i = 0; i < pieces.size(); ++i) {
+		const SDL_Rect& piece = pieces[i];
+		if (i == marked_piece) {
+			continue;
+		}
 		rectangleRGBA(target, rect.x+piece.x, rect.y+piece.y,
 							rect.x+piece.x + piece.w, rect.y+piece.y + piece.h, 255, 255, 0, 255);
+	}
+	if (marked_piece > -1 && marked_piece < pieces.size()) {
+		const SDL_Rect& piece = pieces.at(marked_piece);
+		rectangleRGBA(target, rect.x+piece.x, rect.y+piece.y,
+							rect.x+piece.x + piece.w, rect.y+piece.y + piece.h, 255, 0, 0, 255);
 	}
 }
 
 
 void PuzzleSingleImageState::Update() {
+	// If the mouse button is released, make bMouseUp equal true
+	if ( !(SDL_GetMouseState(nullptr, nullptr)&SDL_BUTTON(1)) ) {
+		globalData.mouseUp=true;
+	}
 
+	if (SDL_GetMouseState(nullptr,nullptr)&SDL_BUTTON(1) && globalData.mouseUp) {
+		globalData.mouseUp = false;
+		
+		SDL_Rect rect;
+		rect.x = globalData.xsize/2-resized_image_width/2;
+		rect.y = globalData.ysize/2-resized_image_height/2;;
+		rect.h = resized_image_height;
+		rect.w = resized_image_width;
+		for (size_t i = 0; i< pieces.size(); ++i) {
+			const SDL_Rect& piece = pieces[i];
+			bool clicked = (globalData.mousex > rect.x+piece.x && globalData.mousex < rect.x+piece.x + piece.w && globalData.mousey > rect.y+piece.y && globalData.mousey < rect.y+piece.y + piece.h);
+			if (clicked) {
+				if (i != marked_piece && marked_piece > -1 && marked_piece < pieces.size()) {
+					std::swap(shuffeled_pieces[i], shuffeled_pieces[marked_piece]);
+					marked_piece = -1;
+				}
+				else {
+					marked_piece = i;
+				}
+			}
+		}
+		CheckSolved();
+	}
 }
 
 void PuzzleSingleImageState::LoadPictureFromFile(const std::string& filename, SDL_Renderer* renderer) {
@@ -173,4 +209,14 @@ void PuzzleSingleImageState::Shuffle() {
 		std::swap(shuffeled_pieces[first], shuffeled_pieces[second]);
 	}
 	shuffeled = true;
+}
+
+
+void PuzzleSingleImageState::CheckSolved() {
+	for (size_t i=0; i < shuffeled_pieces.size(); ++i) {
+		if (shuffeled_pieces[i] != i) {
+			return;
+		}
+	}
+	shuffeled = false;
 }
