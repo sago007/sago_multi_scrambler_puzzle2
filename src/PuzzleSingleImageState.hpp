@@ -39,10 +39,11 @@ public:
 
 	void LoadPictureFromFile(const std::string& filename, SDL_Renderer* renderer);
 
-        void SplitPiece();
-        void SplitPiece(size_t piece_number);
-        void SplitPieceVertical(size_t piece_number);
-        void SplitPieceHorisontal(size_t piece_number);
+	void SplitPiece();
+	void SplitPiece(size_t piece_number);
+	void SplitPieceVertical(size_t piece_number);
+	void SplitPieceHorisontal(size_t piece_number);
+	void Shuffle();
 private:
 	void ClearPicture();
 
@@ -52,6 +53,8 @@ private:
 	int source_image_width = 1;
 	const int resized_image_height = 700;
 	int resized_image_width = 1;
-        std::vector<SDL_Rect> pieces;
-        int min_piece_size = 140;
+	std::vector<SDL_Rect> pieces;
+	int min_piece_size = 140;
+	bool shuffeled = false;
+	std::vector<size_t> shuffeled_pieces;
 };

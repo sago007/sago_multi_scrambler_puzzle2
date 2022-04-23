@@ -37,7 +37,7 @@ PuzzleSingleImageState::~PuzzleSingleImageState() {
 }
 
 bool PuzzleSingleImageState::IsActive() {
-    return true;
+	return true;
 }
 
 void PuzzleSingleImageState::ProcessInput(const SDL_Event& event, bool &processed) {
@@ -51,7 +51,22 @@ void PuzzleSingleImageState::Draw(SDL_Renderer* target) {
 	rect.y = globalData.ysize/2-resized_image_height/2;;
 	rect.h = resized_image_height;
 	rect.w = resized_image_width;
-	SDL_RenderCopy(target, this->pictureTex, NULL, &rect);
+	if (!shuffeled) {
+		SDL_RenderCopy(target, this->pictureTex, NULL, &rect);
+		return;
+	}
+	for (size_t i = 0; i < pieces.size(); ++i) {
+		SDL_Rect destination = pieces[i];
+		destination.x += rect.x;
+		destination.y += rect.y;
+		SDL_Rect source = pieces.at(shuffeled_pieces[i]);
+		double scale = double(source_image_height)/double(resized_image_height);
+		source.x = double(source.x)*scale;
+		source.y = double(source.y)*scale;
+		source.w = double(source.w)*scale;
+		source.h = double(source.h)*scale;
+		SDL_RenderCopy(target, this->pictureTex, &source, &destination);
+	}
 	for (const SDL_Rect& piece : pieces) {
 		rectangleRGBA(target, rect.x+piece.x, rect.y+piece.y,
 							rect.x+piece.x + piece.w, rect.y+piece.y + piece.h, 255, 255, 0, 255);
@@ -87,6 +102,7 @@ void PuzzleSingleImageState::LoadPictureFromFile(const std::string& filename, SD
 	for (int i = 0; i<10; ++i) {
 		SplitPiece();
 	}
+	Shuffle();
 }
 
 void PuzzleSingleImageState::SplitPiece(size_t piece_number) {
@@ -143,4 +159,18 @@ void PuzzleSingleImageState::ClearPicture() {
 		SDL_DestroyTexture(this->pictureTex);
 		this->pictureTex = nullptr;
 	}
+}
+
+void PuzzleSingleImageState::Shuffle() {
+	size_t number_of_peices = pieces.size();
+	shuffeled_pieces.resize(number_of_peices);
+	for (size_t i = 0; i< shuffeled_pieces.size(); ++i) {
+		shuffeled_pieces.at(i) = i;
+	}
+	for (int i = 0 ; i < 100; ++i) {
+		size_t first = rand()%number_of_peices;
+		size_t second = rand()%number_of_peices;
+		std::swap(shuffeled_pieces[first], shuffeled_pieces[second]);
+	}
+	shuffeled = true;
 }
