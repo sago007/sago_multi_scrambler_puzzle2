@@ -1,0 +1,9 @@
+To ensure that all authers is known for each medie file. Only files that cannot include authers in the source are mentioned. 
+
+Poul Sander's files are multi licensed under "GPL v2 or later" OR "CC-BY-SA any version"
+
+/textures/
+background_sixteen_nine.png  Poul Sander (based of qubodup's background.png)
+fallback.png            Poul Sander
+mouse.png               Poul Sander
+
