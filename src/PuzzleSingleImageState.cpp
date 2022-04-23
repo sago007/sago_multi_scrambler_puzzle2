@@ -26,6 +26,7 @@ https://github.com/sago007/saland
 #include <iostream>
 #include "globals.hpp"
 #include <SDL2/SDL2_gfxPrimitives.h>
+#include <time.h>
 
 PuzzleSingleImageState::PuzzleSingleImageState() {
 	
@@ -89,6 +90,7 @@ void PuzzleSingleImageState::LoadPictureFromFile(const std::string& filename, SD
 }
 
 void PuzzleSingleImageState::SplitPiece(size_t piece_number) {
+	srand(time(NULL));
 	if (rand()%2==1) {
 		SplitPieceVertical(piece_number);
 		SplitPieceHorisontal(piece_number);
