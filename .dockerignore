@@ -1,0 +1,8 @@
+*.o
+*.cmake
+*.exe
+nbproject
+Makefile
+CMakeCache.txt
+CMakeFiles
+CPack*

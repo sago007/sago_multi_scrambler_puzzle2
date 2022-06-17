@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.9)
+cmake_minimum_required(VERSION 3.10.2)
 project (sago_multi_scrambler_puzzle2)
 find_package(Boost COMPONENTS program_options REQUIRED)
 

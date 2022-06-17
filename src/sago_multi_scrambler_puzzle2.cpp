@@ -29,6 +29,7 @@ https://github.com/sago007/saland
 #include "sago/SagoTextField.hpp"
 #include "globals.hpp"
 #include "PuzzleSingleImageState.hpp"
+#include "ImageSelectState.hpp"
 #include "sago_common.hpp"
 #include "MainGameState.hpp"
 
@@ -55,6 +56,13 @@ void runGame() {
 	UninitGame();
 }
 
+void runCollection(const std::string& collection_name) {
+	ImageSelectState iss;
+	InitGame();
+	RunGameState(iss);
+	UninitGame();
+}
+
 
 int main(int argc, const char* argv[]) {
 	boost::program_options::options_description desc("Options");
@@ -64,6 +72,7 @@ int main(int argc, const char* argv[]) {
 	("version", "Print version information and quit")
 	("help,h", "Print basic usage information to stdout and quit")
 	("input-file", boost::program_options::value< std::vector<std::string> >(), "Image to open directly")
+	("collection", boost::program_options::value< std::string >(), "Jump straigt to a named collection. Like \"fairy_tales\"")
 	;
 	boost::program_options::variables_map vm;
 	boost::program_options::store(boost::program_options::command_line_parser(argc, argv).options(desc).positional(p).run(), vm);
@@ -80,9 +89,13 @@ int main(int argc, const char* argv[]) {
 	if (vm.count("input-file")) {
 		const std::vector<std::string>& input_files = vm["input-file"].as<std::vector<std::string> >();
 		runSinglePuzzle(input_files.at(0));
+		return 0;
 	}
-	else {
-		runGame();
+	if (vm.count("collection")) {
+		const std::string& collection_name = vm["collection"].as<std::string>();
+		runCollection(collection_name);
+		return 0;
 	}
+	runGame();
 	return 0;
 }

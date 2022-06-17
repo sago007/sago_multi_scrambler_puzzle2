@@ -39,7 +39,7 @@ void RunGameState(sago::GameStateInterface& state ) {
 		SDL_RenderClear(globalData.screen);
 		state.Draw(globalData.screen);
 
-		SDL_Delay(1);
+		SDL_Delay(5);
 		SDL_Event event;
 
 		bool mustWriteScreenshot = false;
