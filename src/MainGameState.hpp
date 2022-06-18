@@ -41,5 +41,8 @@ private:
 	bool isActive = true;
 };
 
+void DrawRectWhite(SDL_Renderer* target, int topx, int topy, int height, int width);
+void DrawRectYellow(SDL_Renderer* target, int topx, int topy, int height, int width);
+
 #endif /* MAINGAMESTATE_HPP */
 
