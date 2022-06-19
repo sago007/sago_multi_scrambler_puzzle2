@@ -48,7 +48,7 @@ void PuzzleSingleImageState::Draw(SDL_Renderer* target) {
 	globalData.spriteHolder->GetSprite("background_sixteen_nine").Draw(target, SDL_GetTicks(), 0, 0);
 	SDL_Rect rect;
 	rect.x = globalData.xsize/2-resized_image_width/2;
-	rect.y = globalData.ysize/2-resized_image_height/2;;
+	rect.y = globalData.ysize/2-resized_image_height/2;
 	rect.h = resized_image_height;
 	rect.w = resized_image_width;
 	if (!shuffeled) {
@@ -124,7 +124,12 @@ void PuzzleSingleImageState::LoadPictureFromFile(const std::string& filename, SD
 	}
 	source_image_height = bitmapSurface->h;
 	source_image_width = bitmapSurface->w;
+	resized_image_height = resized_image_height_max;
 	resized_image_width = double(resized_image_height) * (double(source_image_width)/double(source_image_height));
+	if (resized_image_width > resized_image_width_max) {
+		resized_image_width = resized_image_width_max;
+		resized_image_height = double(resized_image_width) * (double(source_image_height)/double(source_image_width));
+	}
 	this->pictureTex = SDL_CreateTextureFromSurface(renderer, bitmapSurface);
 	std::cerr << resized_image_width << ", " << resized_image_height << "\n";
 	SDL_FreeSurface(bitmapSurface);

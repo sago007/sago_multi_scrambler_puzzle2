@@ -52,8 +52,10 @@ private:
 	SDL_Texture* pictureTex = NULL;
 	int source_image_height = 1;
 	int source_image_width = 1;
-	const int resized_image_height = 700;
+	int resized_image_height = 700;
 	int resized_image_width = 1;
+	const int resized_image_height_max = 700;
+	const int resized_image_width_max = 1100;
 	std::vector<SDL_Rect> pieces;
 	int min_piece_size = 120;
 	bool shuffeled = false;
