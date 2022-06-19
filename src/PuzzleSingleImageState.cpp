@@ -105,6 +105,9 @@ void PuzzleSingleImageState::Update() {
 					std::swap(shuffeled_pieces[i], shuffeled_pieces[marked_piece]);
 					marked_piece = -1;
 				}
+				else if (i == marked_piece) {
+					marked_piece = -1;
+				}
 				else {
 					marked_piece = i;
 				}
