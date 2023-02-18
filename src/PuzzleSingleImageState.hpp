@@ -45,6 +45,8 @@ public:
 	void SplitPieceHorisontal(size_t piece_number);
 	void Shuffle();
 	void CheckSolved();
+
+	bool flipMode = false;
 private:
 	void ClearPicture();
 
@@ -60,5 +62,6 @@ private:
 	int min_piece_size = 120;
 	bool shuffeled = false;
 	std::vector<size_t> shuffeled_pieces;
+	std::vector<size_t> rotated_pieces;
 	int marked_piece = -1;
 };

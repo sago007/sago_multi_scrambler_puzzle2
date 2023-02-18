@@ -65,7 +65,14 @@ void PuzzleSingleImageState::Draw(SDL_Renderer* target) {
 		source.y = double(source.y)*scale;
 		source.w = double(source.w)*scale;
 		source.h = double(source.h)*scale;
-		SDL_RenderCopy(target, this->pictureTex, &source, &destination);
+		int flip = static_cast<int>(SDL_FLIP_NONE);
+		if (rotated_pieces[i] == 1 || rotated_pieces[i] == 3) {
+			flip |= SDL_FLIP_HORIZONTAL;
+		}
+		if (rotated_pieces[i] == 2 || rotated_pieces[i] == 3) {
+			flip |= SDL_FLIP_VERTICAL;
+		}
+		SDL_RenderCopyEx(target, this->pictureTex, &source, &destination, 0, nullptr, static_cast<SDL_RendererFlip>(flip) );
 	}
 	for (size_t i = 0; i < pieces.size(); ++i) {
 		const SDL_Rect& piece = pieces[i];
@@ -101,15 +108,20 @@ void PuzzleSingleImageState::Update() {
 			const SDL_Rect& piece = pieces[i];
 			bool clicked = (globalData.mousex > rect.x+piece.x && globalData.mousex < rect.x+piece.x + piece.w && globalData.mousey > rect.y+piece.y && globalData.mousey < rect.y+piece.y + piece.h);
 			if (clicked) {
-				if (i != marked_piece && marked_piece > -1 && marked_piece < pieces.size()) {
-					std::swap(shuffeled_pieces[i], shuffeled_pieces[marked_piece]);
-					marked_piece = -1;
-				}
-				else if (i == marked_piece) {
-					marked_piece = -1;
+				if (flipMode) {
+					rotated_pieces[i] = (rotated_pieces[i]+1)%4;
 				}
 				else {
-					marked_piece = i;
+					if (i != marked_piece && marked_piece > -1 && marked_piece < pieces.size()) {
+						std::swap(shuffeled_pieces[i], shuffeled_pieces[marked_piece]);
+						marked_piece = -1;
+					}
+					else if (i == marked_piece) {
+						marked_piece = -1;
+					}
+					else {
+						marked_piece = i;
+					}
 				}
 			}
 		}
@@ -208,13 +220,21 @@ void PuzzleSingleImageState::ClearPicture() {
 void PuzzleSingleImageState::Shuffle() {
 	size_t number_of_peices = pieces.size();
 	shuffeled_pieces.resize(number_of_peices);
+	rotated_pieces.resize(number_of_peices);
 	for (size_t i = 0; i< shuffeled_pieces.size(); ++i) {
 		shuffeled_pieces.at(i) = i;
 	}
-	for (int i = 0 ; i < 100; ++i) {
-		size_t first = rand()%number_of_peices;
-		size_t second = rand()%number_of_peices;
-		std::swap(shuffeled_pieces[first], shuffeled_pieces[second]);
+	if (flipMode) {
+		for (size_t i = 0; i< shuffeled_pieces.size(); ++i) {
+			rotated_pieces.at(i) = rand()%4;
+		}
+	}
+	else {
+		for (int i = 0 ; i < 100; ++i) {
+			size_t first = rand()%number_of_peices;
+			size_t second = rand()%number_of_peices;
+			std::swap(shuffeled_pieces[first], shuffeled_pieces[second]);
+		}
 	}
 	shuffeled = true;
 }
@@ -222,6 +242,9 @@ void PuzzleSingleImageState::Shuffle() {
 
 void PuzzleSingleImageState::CheckSolved() {
 	for (size_t i=0; i < shuffeled_pieces.size(); ++i) {
+		if (rotated_pieces[i] != 0) {
+			return;
+		}
 		if (shuffeled_pieces[i] != i) {
 			return;
 		}
