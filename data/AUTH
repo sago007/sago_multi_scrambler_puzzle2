@@ -2,6 +2,9 @@ To ensure that all authers is known for each medie file. Only files that cannot 
 
 Poul Sander's files are multi licensed under "GPL v2 or later" OR "CC-BY-SA any version"
 
+/fonts/
+freeserif.ttf           Free Software Foundation (GPL with exception)
+
 /textures/
 background_sixteen_nine.png  Poul Sander (based of qubodup's background.png)
 fallback.png            Poul Sander

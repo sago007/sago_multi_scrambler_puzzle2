@@ -57,18 +57,18 @@ void runGame() {
 }
 
 void runCollection(const std::string& collection_name) {
+	InitGame();
 	ImageSelectState iss;
 	iss.collection = collection_name;
-	InitGame();
 	RunGameState(iss);
 	UninitGame();
 }
 
 void runFolder(const std::string& folder_name) {
+	InitGame();
 	ImageSelectState iss;
 	iss.folder = folder_name;
 	iss.Init();
-	InitGame();
 	RunGameState(iss);
 	UninitGame();
 }

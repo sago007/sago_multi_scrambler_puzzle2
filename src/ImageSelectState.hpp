@@ -24,6 +24,7 @@ https://github.com/sago007/saland
 #include "sago/GameStateInterface.hpp"
 #include <string>
 #include <vector>
+#include "sago/SagoTextField.hpp"
 
 
 #pragma once
@@ -44,6 +45,7 @@ public:
 	std::string folder = "";
 	std::string collection = "";
 	std::vector<std::string> imageList;
+	std::vector<sago::SagoTextField> imageNameFields;
 
 private:
 	bool isActive = true;

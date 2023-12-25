@@ -92,6 +92,9 @@ void ImageSelectState::Draw(SDL_Renderer* target) {
 		int x = i % number_of_columns;
 		int y = i / number_of_columns;
 		DrawRectYellow(target, top_x+x*(frame_size+frame_spacing), top_y+y*(frame_size+frame_spacing), frame_size, frame_size);
+		if (i < imageNameFields.size()) {
+			imageNameFields[i].Draw(target, top_x+x*(frame_size+frame_spacing)+frame_size/2, top_y+y*(frame_size+frame_spacing)+frame_size-5, sago::SagoTextField::Alignment::center, sago::SagoTextField::VerticalAlignment::bottom);
+		}
 	}
 }
 
@@ -128,6 +131,15 @@ static bool HasExtension(const std::string& filename, const std::string& extensi
 	return std::equal(extension.rbegin(), extension.rend(), filename.rbegin(), ichar_equals);
 }
 
+static void setFontText(const sago::SagoDataHolder* holder, sago::SagoTextField& field, const char* text) {
+        field.SetHolder(holder);
+        field.SetFont("freeserif");
+        field.SetColor({255,255,255,255});
+        field.SetFontSize(24);
+        field.SetOutline(1, {0,0,0,255});
+        field.SetText(text);
+}
+
 
 void ImageSelectState::Init() {
 	if (!folder.empty()) {
@@ -135,6 +147,9 @@ void ImageSelectState::Init() {
 			if (entry.is_regular_file() && (HasExtension(entry.path().string(), ".jpg") || HasExtension(entry.path().string(), ".jpeg") || HasExtension(entry.path().string(), ".png") ) ) {
 				std::cout << entry.path() << std::endl;
 				imageList.push_back(entry.path().string());
+				sago::SagoTextField field;
+				setFontText(globalData.dataHolder, field, entry.path().filename().string().c_str());
+				imageNameFields.push_back(std::move(field));
 			}
 		}
 	}
