@@ -22,6 +22,8 @@ https://github.com/sago007/saland
 */
 
 #include "sago/GameStateInterface.hpp"
+#include <string>
+#include <vector>
 
 
 #pragma once
@@ -36,6 +38,12 @@ public:
 	void ProcessInput(const SDL_Event& event, bool &processed) override;
 	void Draw(SDL_Renderer* target) override;
 	void Update() override;
+	void Init();
+
+	//Set to a filesystem folder to use that folder. Set to empty string to use collections.
+	std::string folder = "";
+	std::string collection = "";
+	std::vector<std::string> imageList;
 
 private:
 	bool isActive = true;

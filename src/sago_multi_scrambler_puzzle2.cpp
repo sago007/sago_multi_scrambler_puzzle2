@@ -58,6 +58,16 @@ void runGame() {
 
 void runCollection(const std::string& collection_name) {
 	ImageSelectState iss;
+	iss.collection = collection_name;
+	InitGame();
+	RunGameState(iss);
+	UninitGame();
+}
+
+void runFolder(const std::string& folder_name) {
+	ImageSelectState iss;
+	iss.folder = folder_name;
+	iss.Init();
 	InitGame();
 	RunGameState(iss);
 	UninitGame();
@@ -73,6 +83,7 @@ int main(int argc, const char* argv[]) {
 	("help,h", "Print basic usage information to stdout and quit")
 	("input-file", boost::program_options::value< std::vector<std::string> >(), "Image to open directly")
 	("collection", boost::program_options::value< std::string >(), "Jump straigt to a named collection. Like \"fairy_tales\"")
+	("folder", boost::program_options::value< std::string >(), "Open a specific folder.")
 	;
 	boost::program_options::variables_map vm;
 	boost::program_options::store(boost::program_options::command_line_parser(argc, argv).options(desc).positional(p).run(), vm);
@@ -94,6 +105,11 @@ int main(int argc, const char* argv[]) {
 	if (vm.count("collection")) {
 		const std::string& collection_name = vm["collection"].as<std::string>();
 		runCollection(collection_name);
+		return 0;
+	}
+	if (vm.count("folder")) {
+		const std::string& folder = vm["folder"].as<std::string>();
+		runFolder(folder);
 		return 0;
 	}
 	runGame();
