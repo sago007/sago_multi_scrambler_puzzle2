@@ -132,6 +132,8 @@ void ImageSelectState::Update() {
 						PuzzleSingleImageState psi;
 						psi.LoadPictureFromFile(imageList[i], globalData.screen);
 						RunGameState(psi);
+						globalData.mouseUp=true;
+						return;
 					}
 				}
 			}

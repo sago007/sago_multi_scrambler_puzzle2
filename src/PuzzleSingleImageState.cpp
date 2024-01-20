@@ -37,11 +37,28 @@ PuzzleSingleImageState::~PuzzleSingleImageState() {
 }
 
 bool PuzzleSingleImageState::IsActive() {
-	return true;
+	return isActive;
+}
+
+bool isEscapeEvent(const SDL_Event& event) {
+        if ( event.type == SDL_KEYDOWN ) {
+                if ( event.key.keysym.sym == SDLK_ESCAPE ) {
+                        return true;
+                }
+        }
+        if (event.type == SDL_CONTROLLERBUTTONDOWN) {
+                if (event.cbutton.button == SDL_CONTROLLER_BUTTON_B || event.cbutton.button == SDL_CONTROLLER_BUTTON_BACK ) {
+                        return true;
+                }
+        }
+        return false;
 }
 
 void PuzzleSingleImageState::ProcessInput(const SDL_Event& event, bool &processed) {
-
+	if (isEscapeEvent(event)) {
+		isActive = false;
+		processed = true;
+	}
 }
 
 void PuzzleSingleImageState::Draw(SDL_Renderer* target) {
