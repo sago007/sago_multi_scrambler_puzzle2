@@ -83,6 +83,8 @@ void ImageHolder::Draw(SDL_Renderer* target, int x, int y, int max_w, int max_h)
 		printf("ImageHolder::Draw() called with no image loaded. Filename: %s\n", source_filename.c_str());
 		return;
 	}
+	int dest_w = max_w;
+	int dest_h = max_h;
 
 	int imgWidth = GetWidth();
 	int imgHeight = GetHeight();
@@ -102,6 +104,9 @@ void ImageHolder::Draw(SDL_Renderer* target, int x, int y, int max_w, int max_h)
 	} else {
 		max_w = static_cast<int>(max_h * aspect_ratio);
 	}
+
+	x = x + (dest_w - max_w) / 2;
+	y = y + (dest_h - max_h) / 2;
 
 	SDL_Rect destRect = { x, y, max_w, max_h };
 	SDL_RenderCopy(target, pictureTex, nullptr, &destRect);
