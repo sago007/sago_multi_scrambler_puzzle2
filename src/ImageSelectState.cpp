@@ -85,6 +85,7 @@ void ImageSelectState::Draw(SDL_Renderer* target) {
 	const int number_of_images_per_page = 6;
 	const int frame_size = 300;
 	const int frame_spacing = 20;
+	const int frame_border = 10;
 	const int number_of_columns = 3;
 	const int top_x = (globalData.xsize-(3*frame_size+2*frame_spacing))/2;
 	const int top_y = (globalData.ysize-(2*frame_size+frame_spacing))/2;
@@ -92,6 +93,9 @@ void ImageSelectState::Draw(SDL_Renderer* target) {
 		int x = i % number_of_columns;
 		int y = i / number_of_columns;
 		DrawRectYellow(target, top_x+x*(frame_size+frame_spacing), top_y+y*(frame_size+frame_spacing), frame_size, frame_size);
+		if (i < imageHolders.size()) {
+			imageHolders[i].Draw(target, top_x+x*(frame_size+frame_spacing)+frame_border, top_y+y*(frame_size+frame_spacing)+frame_border, frame_size-2*frame_border, frame_size-2*frame_border);
+		}
 		if (i < imageNameFields.size()) {
 			imageNameFields[i].Draw(target, top_x+x*(frame_size+frame_spacing)+frame_size/2, top_y+y*(frame_size+frame_spacing)+frame_size-5, sago::SagoTextField::Alignment::center, sago::SagoTextField::VerticalAlignment::bottom);
 		}
@@ -150,6 +154,8 @@ void ImageSelectState::Init() {
 				sago::SagoTextField field;
 				setFontText(globalData.dataHolder, field, entry.path().filename().string().c_str());
 				imageNameFields.push_back(std::move(field));
+				imageHolders.emplace_back();
+				imageHolders.back().LoadPictureFromFile(entry.path().string(), globalData.screen);
 			}
 		}
 	}

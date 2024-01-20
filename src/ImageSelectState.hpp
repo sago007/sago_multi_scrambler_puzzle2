@@ -25,6 +25,7 @@ https://github.com/sago007/saland
 #include <string>
 #include <vector>
 #include "sago/SagoTextField.hpp"
+#include "ImageHolder.hpp"
 
 
 #pragma once
@@ -46,6 +47,7 @@ public:
 	std::string collection = "";
 	std::vector<std::string> imageList;
 	std::vector<sago::SagoTextField> imageNameFields;
+	std::vector<ImageHolder> imageHolders;
 
 private:
 	bool isActive = true;
