@@ -25,6 +25,8 @@ https://github.com/sago007/saland
 #include <filesystem>
 #include <iostream>
 #include "globals.hpp"
+#include "PuzzleSingleImageState.hpp"
+#include "sago_common.hpp"
 
 static void DrawRect(SDL_Renderer* target, int topx, int topy, int height, int width, const std::string& name) {
 	const int size = 32;
@@ -104,7 +106,37 @@ void ImageSelectState::Draw(SDL_Renderer* target) {
 
 
 void ImageSelectState::Update() {
+	// If the mouse button is released, make bMouseUp equal true
+	if ( !(SDL_GetMouseState(nullptr, nullptr)&SDL_BUTTON(1)) ) {
+		globalData.mouseUp=true;
+	}
 
+	if (SDL_GetMouseState(nullptr,nullptr)&SDL_BUTTON(1) && globalData.mouseUp) {
+		globalData.mouseUp = false;
+
+		if (globalData.mousex > 0 && globalData.mousex < globalData.xsize && globalData.mousey > 0 && globalData.mousey < globalData.ysize) {
+			const int number_of_images_per_page = 6;
+			const int frame_size = 300;
+			const int frame_spacing = 20;
+			const int frame_border = 10;
+			const int number_of_columns = 3;
+			const int top_x = (globalData.xsize-(3*frame_size+2*frame_spacing))/2;
+			const int top_y = (globalData.ysize-(2*frame_size+frame_spacing))/2;
+			for (int i = 0; i < number_of_images_per_page; ++i) {
+				int x = i % number_of_columns;
+				int y = i / number_of_columns;
+				if (globalData.mousex > top_x+x*(frame_size+frame_spacing) && globalData.mousex < top_x+x*(frame_size+frame_spacing)+frame_size &&
+						globalData.mousey > top_y+y*(frame_size+frame_spacing) && globalData.mousey < top_y+y*(frame_size+frame_spacing)+frame_size) {
+					if (i < imageList.size()) {
+						printf("Clicked on image %s\n", imageList[i].c_str());
+						PuzzleSingleImageState psi;
+						psi.LoadPictureFromFile(imageList[i], globalData.screen);
+						RunGameState(psi);
+					}
+				}
+			}
+		}
+	}
 }
 
 /**
