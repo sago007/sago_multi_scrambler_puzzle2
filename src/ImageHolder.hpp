@@ -46,6 +46,7 @@ public:
 
 	// Other member functions and variables
 	void LoadPictureFromFile(const std::string& filename, SDL_Renderer* renderer);
+	void LoadPictureFromFileLazy(const std::string& filename);
 	int GetWidth() const;
 	int GetHeight() const;
 	SDL_Texture* GetTexture() const;
@@ -60,11 +61,12 @@ public:
 	 * @param max_w The maximum width to draw. If 0 then the image width is used.
 	 * @param max_h The maximum height to draw. If 0 then the image height is used.
 	*/
-	void Draw(SDL_Renderer* target, int x, int y, int max_w = 0, int max_h = 0) const;
+	void Draw(SDL_Renderer* target, int x, int y, int max_w = 0, int max_h = 0);
 
 private:
 	// Private member variables
 	SDL_Texture* pictureTex = NULL;
+	bool do_lazy_load = false;
 	int source_image_height = 1;
 	int source_image_width = 1;
 	std::string source_filename;

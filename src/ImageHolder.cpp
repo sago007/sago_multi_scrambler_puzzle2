@@ -31,6 +31,7 @@ ImageHolder::ImageHolder(ImageHolder&& other) {
 	source_image_width = other.source_image_width;
 	source_image_height = other.source_image_height;
 	source_filename = other.source_filename;
+	do_lazy_load = other.do_lazy_load;
 	other.pictureTex = nullptr;
 }
 
@@ -61,9 +62,13 @@ void ImageHolder::LoadPictureFromFile(const std::string& filename, SDL_Renderer*
 	source_image_width = pictureSurface->w;
 	source_image_height = pictureSurface->h;
 
-SDL_FreeSurface(pictureSurface);
+	SDL_FreeSurface(pictureSurface);
 }
 
+void ImageHolder::LoadPictureFromFileLazy(const std::string& filename) {
+	source_filename = filename;
+	do_lazy_load = true;
+}
 
 
 int ImageHolder::GetWidth() const {
@@ -78,9 +83,15 @@ SDL_Texture* ImageHolder::GetTexture() const {
 	return pictureTex;
 }
 
-void ImageHolder::Draw(SDL_Renderer* target, int x, int y, int max_w, int max_h) const {
+void ImageHolder::Draw(SDL_Renderer* target, int x, int y, int max_w, int max_h) {
+	if (do_lazy_load) {
+		printf("Lazy loading image: %s\n", source_filename.c_str());
+		std::string filename = source_filename;
+		LoadPictureFromFile(filename, target);
+		do_lazy_load = false;
+	}
 	if (pictureTex == nullptr) {
-		printf("ImageHolder::Draw() called with no image loaded. Filename: %s\n", source_filename.c_str());
+		//printf("ImageHolder::Draw() called with no image loaded. Filename: %s\n", source_filename.c_str());
 		return;
 	}
 	int dest_w = max_w;

@@ -189,7 +189,7 @@ void ImageSelectState::Init() {
 				setFontText(globalData.dataHolder, field, entry.path().filename().string().c_str());
 				imageNameFields.push_back(std::move(field));
 				imageHolders.emplace_back();
-				imageHolders.back().LoadPictureFromFile(entry.path().string(), globalData.screen);
+				imageHolders.back().LoadPictureFromFileLazy(entry.path().string());
 			}
 		}
 	}
