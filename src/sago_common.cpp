@@ -27,6 +27,7 @@ https://github.com/sago007/saland
 #include "sago/SagoTextField.hpp"
 #include "globals.hpp"
 #include "sago_common.hpp"
+#include "SagoImGui.hpp"
 
 void InitSagoFS(int argc, const char* argv[]) {
 	PHYSFS_init(argv[0]);
@@ -37,7 +38,22 @@ void RunGameState(sago::GameStateInterface& state ) {
 	bool done = false;  //We are done!
 	while (!done && !globalData.isShuttingDown) {
 		SDL_RenderClear(globalData.screen);
+		ImGui_ImplSDLRenderer2_NewFrame();
+		ImGui_ImplSDL2_NewFrame();
+		ImGui::NewFrame();
 		state.Draw(globalData.screen);
+
+		ImGui::Render();
+		ImGuiIO& io = ImGui::GetIO();
+		float x, y;
+		SDL_RenderGetScale(globalData.screen, &x, &y);
+		SDL_RenderSetScale(globalData.screen, io.DisplayFramebufferScale.x, io.DisplayFramebufferScale.y);
+		ImGui_ImplSDLRenderer2_RenderDrawData( ImGui::GetDrawData() );
+		SDL_RenderSetScale(globalData.screen, x, y);
+
+		//While using Dear ImGui we do not draw the mouse ourself. This is gone: globalData.mouse.Draw(globalData.screen, SDL_GetTicks(), globalData.mousex, globalData.mousey);
+		SDL_RenderPresent(globalData.screen);
+
 
 		SDL_Delay(5);
 		SDL_Event event;
@@ -62,8 +78,7 @@ void RunGameState(sago::GameStateInterface& state ) {
 
 		state.Update();
 
-		globalData.mouse.Draw(globalData.screen, SDL_GetTicks(), globalData.mousex, globalData.mousey);
-		SDL_RenderPresent(globalData.screen);
+
 
 		if (!state.IsActive()) {
 			done = true;
@@ -109,9 +124,11 @@ void InitGame() {
 	int rendererFlags = 0;
 
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
+	SDL_SetHint(SDL_HINT_MOUSE_RELATIVE_SCALING, "1");
 	win = SDL_CreateWindow(GAMENAME, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_WINDOW_RESIZABLE);
 	globalData.screen = SDL_CreateRenderer(win, -1, rendererFlags);
-	SDL_RenderSetLogicalSize(globalData.screen, globalData.xsize, globalData.ysize);
+	SDL_RenderSetLogicalSize(globalData.screen, width, height);
+	InitImGui(win, globalData.screen, width, height);
 	
 	dataHolder.invalidateAll(globalData.screen);
 	globalData.spriteHolder.reset(new sago::SagoSpriteHolder(dataHolder));

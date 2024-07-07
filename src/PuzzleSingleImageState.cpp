@@ -27,6 +27,7 @@ https://github.com/sago007/saland
 #include "globals.hpp"
 #include <SDL2/SDL2_gfxPrimitives.h>
 #include <time.h>
+#include "SagoImGui.hpp"
 
 PuzzleSingleImageState::PuzzleSingleImageState() {
 	
@@ -59,6 +60,7 @@ void PuzzleSingleImageState::ProcessInput(const SDL_Event& event, bool &processe
 		isActive = false;
 		processed = true;
 	}
+	ImGui_ImplSDL2_ProcessEvent(&event);
 }
 
 void PuzzleSingleImageState::Draw(SDL_Renderer* target) {
@@ -70,40 +72,54 @@ void PuzzleSingleImageState::Draw(SDL_Renderer* target) {
 	rect.w = resized_image_width;
 	if (!shuffeled) {
 		SDL_RenderCopy(target, this->pictureTex, NULL, &rect);
-		return;
 	}
-	for (size_t i = 0; i < pieces.size(); ++i) {
-		SDL_Rect destination = pieces[i];
-		destination.x += rect.x;
-		destination.y += rect.y;
-		SDL_Rect source = pieces.at(shuffeled_pieces[i]);
-		double scale = double(source_image_height)/double(resized_image_height);
-		source.x = double(source.x)*scale;
-		source.y = double(source.y)*scale;
-		source.w = double(source.w)*scale;
-		source.h = double(source.h)*scale;
-		int flip = static_cast<int>(SDL_FLIP_NONE);
-		if (rotated_pieces[i] == 1 || rotated_pieces[i] == 3) {
-			flip |= SDL_FLIP_HORIZONTAL;
+	else {
+		for (size_t i = 0; i < pieces.size(); ++i) {
+			SDL_Rect destination = pieces[i];
+			destination.x += rect.x;
+			destination.y += rect.y;
+			SDL_Rect source = pieces.at(shuffeled_pieces[i]);
+			double scale = double(source_image_height)/double(resized_image_height);
+			source.x = double(source.x)*scale;
+			source.y = double(source.y)*scale;
+			source.w = double(source.w)*scale;
+			source.h = double(source.h)*scale;
+			int flip = static_cast<int>(SDL_FLIP_NONE);
+			if (rotated_pieces[i] == 1 || rotated_pieces[i] == 3) {
+				flip |= SDL_FLIP_HORIZONTAL;
+			}
+			if (rotated_pieces[i] == 2 || rotated_pieces[i] == 3) {
+				flip |= SDL_FLIP_VERTICAL;
+			}
+			SDL_RenderCopyEx(target, this->pictureTex, &source, &destination, 0, nullptr, static_cast<SDL_RendererFlip>(flip) );
 		}
-		if (rotated_pieces[i] == 2 || rotated_pieces[i] == 3) {
-			flip |= SDL_FLIP_VERTICAL;
+		for (size_t i = 0; i < pieces.size(); ++i) {
+			const SDL_Rect& piece = pieces[i];
+			if (i == marked_piece) {
+				continue;
+			}
+			rectangleRGBA(target, rect.x+piece.x, rect.y+piece.y,
+								rect.x+piece.x + piece.w, rect.y+piece.y + piece.h, 255, 255, 0, 255);
 		}
-		SDL_RenderCopyEx(target, this->pictureTex, &source, &destination, 0, nullptr, static_cast<SDL_RendererFlip>(flip) );
-	}
-	for (size_t i = 0; i < pieces.size(); ++i) {
-		const SDL_Rect& piece = pieces[i];
-		if (i == marked_piece) {
-			continue;
+		if (marked_piece > -1 && marked_piece < pieces.size()) {
+			const SDL_Rect& piece = pieces.at(marked_piece);
+			rectangleRGBA(target, rect.x+piece.x, rect.y+piece.y,
+								rect.x+piece.x + piece.w, rect.y+piece.y + piece.h, 255, 0, 0, 255);
 		}
-		rectangleRGBA(target, rect.x+piece.x, rect.y+piece.y,
-							rect.x+piece.x + piece.w, rect.y+piece.y + piece.h, 255, 255, 0, 255);
 	}
-	if (marked_piece > -1 && marked_piece < pieces.size()) {
-		const SDL_Rect& piece = pieces.at(marked_piece);
-		rectangleRGBA(target, rect.x+piece.x, rect.y+piece.y,
-							rect.x+piece.x + piece.w, rect.y+piece.y + piece.h, 255, 0, 0, 255);
+
+
+	ImGui::BeginMainMenuBar();
+	if (ImGui::BeginMenu("File")) {
+		if (ImGui::MenuItem("Close")) {
+			isActive = false;
+		}
+		if (ImGui::MenuItem("Shuffle")) {
+			Shuffle();
+		}
+		ImGui::EndMenu();
 	}
+	ImGui::EndMainMenuBar();
 }
 
 

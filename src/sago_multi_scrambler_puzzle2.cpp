@@ -32,6 +32,7 @@ https://github.com/sago007/saland
 #include "ImageSelectState.hpp"
 #include "sago_common.hpp"
 #include "MainGameState.hpp"
+#include "SagoImGui.hpp"
 
 #ifndef VERSIONNUMBER
 #define VERSIONNUMBER "0.1.0"

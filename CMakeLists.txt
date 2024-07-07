@@ -18,6 +18,10 @@ pkg_search_module(SDL2GFX REQUIRED SDL2_gfx)
 include_directories(${SDL2GFX_INCLUDE_DIRS})
 
 
+pkg_search_module(IMGUI REQUIRED imgui)
+include_directories(${IMGUI_INCLUDE_DIRS})
+
+
 include_directories(SYSTEM "src/Libs/include")
 
 
@@ -27,4 +31,5 @@ add_executable(sago_multi_scrambler_puzzle2 ${SOURCES})
 TARGET_LINK_LIBRARIES( sago_multi_scrambler_puzzle2 ${Boost_LIBRARIES} )
 target_link_libraries( sago_multi_scrambler_puzzle2 ${SDL2_LIBRARIES})
 target_link_libraries( sago_multi_scrambler_puzzle2 physfs)
+target_link_libraries( sago_multi_scrambler_puzzle2 ${IMGUI_LIBRARIES})
 target_link_libraries( sago_multi_scrambler_puzzle2 ${SDL2MIXER_LIBRARIES} ${SDL2IMAGE_LIBRARIES} ${SDL2TTF_LIBRARIES} ${SDL2GFX_LIBRARIES})
