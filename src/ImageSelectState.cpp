@@ -96,11 +96,12 @@ void ImageSelectState::Draw(SDL_Renderer* target) {
 		int x = i % number_of_columns;
 		int y = i / number_of_columns;
 		DrawRectYellow(target, top_x+x*(frame_size+frame_spacing), top_y+y*(frame_size+frame_spacing), frame_size, frame_size);
-		if (i < imageHolders.size()) {
-			imageHolders[i].Draw(target, top_x+x*(frame_size+frame_spacing)+frame_border, top_y+y*(frame_size+frame_spacing)+frame_border, frame_size-2*frame_border, frame_size-2*frame_border);
+		size_t image_number = i + firstImage;
+		if (image_number < imageHolders.size()) {
+			imageHolders[image_number].Draw(target, top_x+x*(frame_size+frame_spacing)+frame_border, top_y+y*(frame_size+frame_spacing)+frame_border, frame_size-2*frame_border, frame_size-2*frame_border);
 		}
-		if (i < imageNameFields.size()) {
-			imageNameFields[i].Draw(target, top_x+x*(frame_size+frame_spacing)+frame_size/2, top_y+y*(frame_size+frame_spacing)+frame_size-5, sago::SagoTextField::Alignment::center, sago::SagoTextField::VerticalAlignment::bottom);
+		if (image_number < imageNameFields.size()) {
+			imageNameFields[image_number].Draw(target, top_x+x*(frame_size+frame_spacing)+frame_size/2, top_y+y*(frame_size+frame_spacing)+frame_size-5, sago::SagoTextField::Alignment::center, sago::SagoTextField::VerticalAlignment::bottom);
 		}
 	}
 
@@ -112,6 +113,19 @@ void ImageSelectState::Draw(SDL_Renderer* target) {
 		ImGui::EndMenu();
 	}
 	ImGui::EndMainMenuBar();
+	ImGui::Begin("Page control");
+	if (ImGui::Button("Next page")) {
+        firstImage += number_of_images_per_page;
+	}
+	if (ImGui::Button("Previous page")) {
+		if (firstImage < number_of_images_per_page) {
+			firstImage = 0;
+		}
+		else {
+			firstImage -= number_of_images_per_page;
+		}
+	}
+	ImGui::End();
 }
 
 
@@ -135,12 +149,13 @@ void ImageSelectState::Update() {
 			for (int i = 0; i < number_of_images_per_page; ++i) {
 				int x = i % number_of_columns;
 				int y = i / number_of_columns;
+				size_t image_number = i + firstImage;
 				if (globalData.mousex > top_x+x*(frame_size+frame_spacing) && globalData.mousex < top_x+x*(frame_size+frame_spacing)+frame_size &&
 						globalData.mousey > top_y+y*(frame_size+frame_spacing) && globalData.mousey < top_y+y*(frame_size+frame_spacing)+frame_size) {
-					if (i < imageList.size()) {
-						printf("Clicked on image %s\n", imageList[i].c_str());
+					if (image_number < imageList.size()) {
+						printf("Clicked on image %s\n", imageList[image_number].c_str());
 						PuzzleSingleImageState psi;
-						psi.LoadPictureFromFile(imageList[i], globalData.screen);
+						psi.LoadPictureFromFile(imageList[image_number], globalData.screen);
 						RunGameState(psi);
 						globalData.mouseUp=true;
 						return;

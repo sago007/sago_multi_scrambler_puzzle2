@@ -48,6 +48,7 @@ public:
 	std::vector<std::string> imageList;
 	std::vector<sago::SagoTextField> imageNameFields;
 	std::vector<ImageHolder> imageHolders;
+	size_t firstImage = 0;
 
 private:
 	bool isActive = true;
