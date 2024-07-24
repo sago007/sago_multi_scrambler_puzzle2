@@ -27,6 +27,7 @@ https://github.com/sago007/saland
 #include "globals.hpp"
 #include "PuzzleSingleImageState.hpp"
 #include "sago_common.hpp"
+#include "SagoImGui.hpp"
 
 static void DrawRect(SDL_Renderer* target, int topx, int topy, int height, int width, const std::string& name) {
 	const int size = 32;
@@ -76,11 +77,11 @@ ImageSelectState::~ImageSelectState() {
 }
 
 bool ImageSelectState::IsActive() {
-	return true;
+	return isActive;
 }
 
 void ImageSelectState::ProcessInput(const SDL_Event& event, bool &processed) {
-
+	ImGui_ImplSDL2_ProcessEvent(&event);
 }
 
 void ImageSelectState::Draw(SDL_Renderer* target) {
@@ -102,6 +103,15 @@ void ImageSelectState::Draw(SDL_Renderer* target) {
 			imageNameFields[i].Draw(target, top_x+x*(frame_size+frame_spacing)+frame_size/2, top_y+y*(frame_size+frame_spacing)+frame_size-5, sago::SagoTextField::Alignment::center, sago::SagoTextField::VerticalAlignment::bottom);
 		}
 	}
+
+	ImGui::BeginMainMenuBar();
+	if (ImGui::BeginMenu("File")) {
+		if (ImGui::MenuItem("Close")) {
+			isActive = false;
+		}
+		ImGui::EndMenu();
+	}
+	ImGui::EndMainMenuBar();
 }
 
 
