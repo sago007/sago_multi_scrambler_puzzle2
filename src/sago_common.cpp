@@ -116,7 +116,7 @@ static SDL_Window* win = nullptr;
 
 void InitGame() {
 	int width = globalData.xsize, height = globalData.ysize;
-	SDL_Init(SDL_INIT_VIDEO);
+	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER);
 	IMG_Init(IMG_INIT_PNG);
 	TTF_Init();
 	Mix_Init(MIX_INIT_OGG);
