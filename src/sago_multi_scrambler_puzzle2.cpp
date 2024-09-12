@@ -32,7 +32,7 @@ https://github.com/sago007/saland
 #include "ImageSelectState.hpp"
 #include "sago_common.hpp"
 #include "MainGameState.hpp"
-#include "SagoImGui.hpp"
+#include "editor/SagoTextureSelector.hpp"
 
 #ifndef VERSIONNUMBER
 #define VERSIONNUMBER "0.1.0"
@@ -74,6 +74,14 @@ void runFolder(const std::string& folder_name) {
 	UninitGame();
 }
 
+void runEditor() {
+	InitGame();
+	SagoTextureSelector sts;
+	sts.Init();
+	RunGameState(sts);
+	UninitGame();
+}
+
 
 int main(int argc, const char* argv[]) {
 	boost::program_options::options_description desc("Options");
@@ -85,6 +93,7 @@ int main(int argc, const char* argv[]) {
 	("input-file", boost::program_options::value< std::vector<std::string> >(), "Image to open directly")
 	("collection", boost::program_options::value< std::string >(), "Jump straigt to a named collection. Like \"fairy_tales\"")
 	("folder", boost::program_options::value< std::string >(), "Open a specific folder.")
+	("editor", "Opens a build in editor. Not implemented yet.")
 	;
 	boost::program_options::variables_map vm;
 	boost::program_options::store(boost::program_options::command_line_parser(argc, argv).options(desc).positional(p).run(), vm);
@@ -111,6 +120,10 @@ int main(int argc, const char* argv[]) {
 	if (vm.count("folder")) {
 		const std::string& folder = vm["folder"].as<std::string>();
 		runFolder(folder);
+		return 0;
+	}
+	if (vm.count("editor")) {
+		runEditor();
 		return 0;
 	}
 	runGame();
