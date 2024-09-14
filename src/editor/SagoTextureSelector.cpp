@@ -14,15 +14,18 @@ static void addLinesToCanvas(SDL_Renderer* renderer, SDL_Texture* texture, int x
 
 	SDL_SetRenderDrawColor(renderer, 255, 0, 0, SDL_ALPHA_OPAQUE);
 	if (xstep > 0) {
-		for (int i = xoffset; i < width; i += xstep) {
-			SDL_RenderDrawLine(renderer, i, 0, i, height);
+		for (int i = 0; i < width+1; i += xstep) {
+			//SDL_RenderDrawLine(renderer, i, 0, i, height);
+			ImGui::GetWindowDrawList()->AddLine(ImVec2(i+xoffset, yoffset), ImVec2(i+xoffset, height+yoffset), IM_COL32(255, 0, 0, 255));
 		}
 	}
 	if (ystep > 0) {
-		for (int i = yoffset; i < height; i += ystep) {
-			SDL_RenderDrawLine(renderer, 0, i, width, i);
+		for (int i = 0; i < height+1; i += ystep) {
+			//SDL_RenderDrawLine(renderer, 0, i, width, i);
+			ImGui::GetWindowDrawList()->AddLine(ImVec2(xoffset, i+yoffset), ImVec2(width+xoffset, i+yoffset), IM_COL32(255, 0, 0, 255));
 		}
 	}
+	SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
 }
 
 static void addFolderToList(const std::string& folder, std::vector<std::string>& list, const std::string& filter = "") {
@@ -67,8 +70,11 @@ void SagoTextureSelector::runTextureSelectorFrame(SDL_Renderer* target) {
 		SDL_Texture* current_texture = globalData.dataHolder->getTexturePtr(remove_file_extension(selected_texture));
 		SDL_QueryTexture(current_texture, nullptr, nullptr, &tex_w, &tex_h);
 		ImGui::Text("Size: %d x %d", tex_w, tex_h);
+		ImGui::BeginChild("Test");
+		ImVec2 p = ImGui::GetCursorScreenPos();
 		ImGui::Image(current_texture, ImVec2((float)tex_w, (float)tex_h));
-		addLinesToCanvas(target, current_texture);
+		addLinesToCanvas(target, current_texture, 32, 32, p.x, p.y);
+		ImGui::EndChild();
 	}
 	ImGui::End();
 
