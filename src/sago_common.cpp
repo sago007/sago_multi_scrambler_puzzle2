@@ -46,10 +46,10 @@ void RunGameState(sago::GameStateInterface& state ) {
 		ImGui::Render();
 		ImGuiIO& io = ImGui::GetIO();
 		float x, y;
-		SDL_RenderGetScale(globalData.screen, &x, &y);
-		SDL_RenderSetScale(globalData.screen, io.DisplayFramebufferScale.x, io.DisplayFramebufferScale.y);
+		//SDL_RenderGetScale(globalData.screen, &x, &y);
+		//SDL_RenderSetScale(globalData.screen, io.DisplayFramebufferScale.x, io.DisplayFramebufferScale.y);
 		ImGui_ImplSDLRenderer2_RenderDrawData( ImGui::GetDrawData(), globalData.screen );
-		SDL_RenderSetScale(globalData.screen, x, y);
+		//SDL_RenderSetScale(globalData.screen, x, y);
 
 		//While using Dear ImGui we do not draw the mouse ourself. This is gone: globalData.mouse.Draw(globalData.screen, SDL_GetTicks(), globalData.mousex, globalData.mousey);
 		SDL_RenderPresent(globalData.screen);
