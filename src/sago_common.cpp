@@ -37,6 +37,7 @@ void InitSagoFS(int argc, const char* argv[]) {
 void RunGameState(sago::GameStateInterface& state ) {
 	bool done = false;  //We are done!
 	while (!done && !globalData.isShuttingDown) {
+		SDL_SetRenderDrawColor(globalData.screen, 0, 0, 0, 255);
 		SDL_RenderClear(globalData.screen);
 		ImGui_ImplSDLRenderer2_NewFrame();
 		ImGui_ImplSDL2_NewFrame();
@@ -65,6 +66,12 @@ void RunGameState(sago::GameStateInterface& state ) {
 				if ( event.type == SDL_QUIT ) {
 						globalData.isShuttingDown = true;
 						done = true;
+				}
+
+				if (event.type == SDL_WINDOWEVENT) {
+					if (event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {
+						SDL_GetRendererOutputSize(globalData.screen, &globalData.xsize, &globalData.ysize);
+					}
 				}
 
 				if ( event.key.keysym.sym == SDLK_F9 ) {
@@ -127,7 +134,7 @@ void InitGame() {
 	SDL_SetHint(SDL_HINT_MOUSE_RELATIVE_SCALING, "1");
 	win = SDL_CreateWindow(GAMENAME, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_WINDOW_RESIZABLE);
 	globalData.screen = SDL_CreateRenderer(win, -1, rendererFlags);
-	SDL_RenderSetLogicalSize(globalData.screen, width, height);
+	//SDL_RenderSetLogicalSize(globalData.screen, width, height);
 	InitImGui(win, globalData.screen, width, height);
 	
 	dataHolder.invalidateAll(globalData.screen);

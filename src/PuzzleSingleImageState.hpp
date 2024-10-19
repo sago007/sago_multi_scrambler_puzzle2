@@ -46,6 +46,10 @@ public:
 	void Shuffle();
 	void CheckSolved();
 
+	void ResizeImage();
+	void ResizeImagePhysical();
+	void CreatePhysicalPieces();
+
 	bool flipMode = false;
 private:
 	void ClearPicture();
@@ -54,11 +58,14 @@ private:
 	SDL_Texture* pictureTex = NULL;
 	int source_image_height = 1;
 	int source_image_width = 1;
-	int resized_image_height = 700;
-	int resized_image_width = 1;
-	const int resized_image_height_max = 700;
-	const int resized_image_width_max = 1100;
-	std::vector<SDL_Rect> pieces;
+	int resized_image_logical_height = 700;
+	int resized_image_logical_width = 1;
+	const int resized_image_logical_height_max = 700;
+	const int resized_image_logical_width_max = 1100;
+	int resized_image_physical_height = 700;
+	int resized_image_physical_width = 1100;
+	std::vector<SDL_Rect> pieces_logical;
+	std::vector<SDL_Rect> pieces_physical;
 	int min_piece_size = 120;
 	bool shuffeled = false;
 	std::vector<size_t> shuffeled_pieces;

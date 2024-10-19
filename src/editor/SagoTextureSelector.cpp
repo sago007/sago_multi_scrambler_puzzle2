@@ -64,7 +64,7 @@ void SagoTextureSelector::runTextureSelectorFrame(SDL_Renderer* target) {
 
 	ImGui::End();
 
-	ImGui::Begin("Canvas");
+	ImGui::Begin("TextureViewer");
 	if (selected_texture.length()) {
 		int tex_w, tex_h;
 		SDL_Texture* current_texture = globalData.dataHolder->getTexturePtr(remove_file_extension(selected_texture));
