@@ -69,7 +69,6 @@ void PuzzleSingleImageState::ProcessInput(const SDL_Event& event, bool &processe
 }
 
 void PuzzleSingleImageState::Draw(SDL_Renderer* target) {
-	globalData.spriteHolder->GetSprite("background_sixteen_nine").Draw(target, SDL_GetTicks(), 0, 0);
 	SDL_Rect rect;
 	rect.x = globalData.xsize/2-resized_image_physical_width/2;
 	rect.y = globalData.ysize/2-resized_image_physical_height/2;

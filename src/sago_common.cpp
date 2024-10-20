@@ -38,7 +38,8 @@ void RunGameState(sago::GameStateInterface& state ) {
 	bool done = false;  //We are done!
 	while (!done && !globalData.isShuttingDown) {
 		SDL_SetRenderDrawColor(globalData.screen, 0, 0, 0, 255);
-		SDL_RenderClear(globalData.screen);
+		//SDL_RenderClear(globalData.screen);
+		DrawBackground(globalData.screen);
 		ImGui_ImplSDLRenderer2_NewFrame();
 		ImGui_ImplSDL2_NewFrame();
 		ImGui::NewFrame();
@@ -91,6 +92,31 @@ void RunGameState(sago::GameStateInterface& state ) {
 			done = true;
 		}
 	}
+}
+
+void DrawBackground(SDL_Renderer* target) {
+	SDL_RenderClear(target);
+	sago::SagoSprite background = globalData.spriteHolder->GetSprite("background_tile");
+	size_t ticks = SDL_GetTicks();
+	if (true) {
+		int nextX = 0;
+		if (true) {
+			nextX -= (ticks/100)%background.GetWidth();
+		}
+		while (nextX < globalData.xsize) {
+			int nextY = 0;
+			if (true) {
+				nextY -= (ticks/100)%background.GetWidth();
+			}
+			while (nextY < globalData.ysize) {
+				background.Draw(target, ticks, nextX, nextY);
+				nextY += background.GetHeight();
+			}
+			nextX += background.GetWidth();
+		}
+		return;
+	}
+	background.DrawScaled(target, ticks, 0, 0, globalData.xsize, globalData.ysize);
 }
 
 /**

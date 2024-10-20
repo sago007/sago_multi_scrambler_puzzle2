@@ -30,6 +30,7 @@ void RunGameState(sago::GameStateInterface& state );
 void UpdateMouseCoordinates(const SDL_Event& event, int& mousex, int& mousey);
 void InitGame();
 void UninitGame();
+void DrawBackground(SDL_Renderer* target);
 
 #endif /* SAGO_COMMON_HPP */
 
