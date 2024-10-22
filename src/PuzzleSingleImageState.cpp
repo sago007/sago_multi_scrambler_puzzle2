@@ -96,7 +96,6 @@ void PuzzleSingleImageState::Draw(SDL_Renderer* target) {
 				flip |= SDL_FLIP_VERTICAL;
 			}
 			SDL_RenderCopyEx(target, this->pictureTex, &source, &destination, 0, nullptr, static_cast<SDL_RendererFlip>(flip) );
-			std::cout << "Writing piece " << i << " at " << destination.x << ", " << destination.y << " from " << source.x << ", " << source.y << "\n";
 		}
 		for (size_t i = 0; i < pieces_physical.size(); ++i) {
 			const SDL_Rect& piece = pieces_physical[i];
