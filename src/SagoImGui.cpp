@@ -32,6 +32,7 @@ void InitImGui(SDL_Window* window, SDL_Renderer* renderer, int width, int height
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 	io.DisplaySize.x = static_cast<float>(width);
 	io.DisplaySize.y = static_cast<float>(height);
 

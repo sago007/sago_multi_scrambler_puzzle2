@@ -72,7 +72,7 @@ void SagoTextureSelector::runTextureSelectorFrame(SDL_Renderer* target) {
 		ImGui::Text("Size: %d x %d", tex_w, tex_h);
 		ImGui::BeginChild("Test");
 		ImVec2 p = ImGui::GetCursorScreenPos();
-		ImGui::Image(current_texture, ImVec2((float)tex_w, (float)tex_h));
+		ImGui::Image((ImTextureID)(intptr_t)current_texture, ImVec2((float)tex_w, (float)tex_h));
 		addLinesToCanvas(target, current_texture, 32, 32, p.x, p.y);
 		ImGui::EndChild();
 	}
