@@ -17,6 +17,11 @@ include_directories(${SDL2TTF_INCLUDE_DIRS})
 pkg_search_module(SDL2GFX REQUIRED SDL2_gfx)
 include_directories(${SDL2GFX_INCLUDE_DIRS})
 
+if (SALAND_USE_EMBEDDED_PLATFORM_FOLDERS)
+	message("Using embedded PlatformFolders")
+	add_subdirectory("embedded_libs/PlatformFolders-4.2.0" EXCLUDE_FROM_ALL)
+	message("Done processing PlatformFolders")
+endif()
 
 
 include_directories(SYSTEM "src/Libs/include")
@@ -29,5 +34,5 @@ file(GLOB SOURCES "src/*.cpp" "src/*/*.cpp" "src/*/*/*.cpp" "src/*/*/*/*.cpp" "s
 add_executable(sago_multi_scrambler_puzzle2 ${SOURCES})
 TARGET_LINK_LIBRARIES( sago_multi_scrambler_puzzle2 ${Boost_LIBRARIES} )
 target_link_libraries( sago_multi_scrambler_puzzle2 ${SDL2_LIBRARIES})
-target_link_libraries( sago_multi_scrambler_puzzle2 physfs)
+target_link_libraries( sago_multi_scrambler_puzzle2 physfs platform_folders)
 target_link_libraries( sago_multi_scrambler_puzzle2 ${SDL2MIXER_LIBRARIES} ${SDL2IMAGE_LIBRARIES} ${SDL2TTF_LIBRARIES} ${SDL2GFX_LIBRARIES})

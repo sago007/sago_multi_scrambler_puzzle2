@@ -28,10 +28,13 @@ https://github.com/sago007/saland
 #include "globals.hpp"
 #include "sago_common.hpp"
 #include "SagoImGui.hpp"
+#include "sago/platform_folders.h"
+#include "os.hpp"
 
 void InitSagoFS(int argc, const char* argv[]) {
 	PHYSFS_init(argv[0]);
 	PHYSFS_mount((std::string(PHYSFS_getBaseDir())+"/data").c_str(), nullptr, 0);
+	OsCreateSaveFolder();
 }
 
 void RunGameState(sago::GameStateInterface& state ) {
@@ -146,6 +149,7 @@ sago::SagoDataHolder dataHolder;
 
 
 static SDL_Window* win = nullptr;
+static std::string imgui_inifile;
 
 void InitGame() {
 	int width = globalData.xsize, height = globalData.ysize;
@@ -162,6 +166,10 @@ void InitGame() {
 	globalData.screen = SDL_CreateRenderer(win, -1, rendererFlags);
 	//SDL_RenderSetLogicalSize(globalData.screen, width, height);
 	InitImGui(win, globalData.screen, width, height);
+	ImGuiIO& io = ImGui::GetIO();
+	io.IniFilename = nullptr;
+	imgui_inifile = getPathToSaveFiles() + "/imgui.ini";
+	ImGui::LoadIniSettingsFromDisk(imgui_inifile.c_str());
 	
 	dataHolder.invalidateAll(globalData.screen);
 	globalData.spriteHolder.reset(new sago::SagoSpriteHolder(dataHolder));
@@ -171,6 +179,8 @@ void InitGame() {
 }
 
 void UninitGame() {
+	ImGui::SaveIniSettingsToDisk(imgui_inifile.c_str());
+
 	SDL_DestroyRenderer(globalData.screen);
 	SDL_DestroyWindow(win);
 

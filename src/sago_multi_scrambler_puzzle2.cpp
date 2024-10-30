@@ -33,10 +33,7 @@ https://github.com/sago007/saland
 #include "sago_common.hpp"
 #include "MainGameState.hpp"
 #include "editor/SagoTextureSelector.hpp"
-
-#ifndef VERSIONNUMBER
-#define VERSIONNUMBER "0.1.0"
-#endif
+#include "version.h"
 
 
 GlobalData globalData;
@@ -103,7 +100,7 @@ int main(int argc, const char* argv[]) {
 		return 0;
 	}
 	if (vm.count("version")) {
-		std::cout << "sago_multi_scrambler_puzzle2 " << VERSIONNUMBER << "\n";
+		std::cout << GAMENAME << " " << VERSION_NUMBER << "\n";
 		return 0;
 	}
 	InitSagoFS(argc, argv);
