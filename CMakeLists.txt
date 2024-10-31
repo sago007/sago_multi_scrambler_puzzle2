@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.10.2)
 project (sago_multi_scrambler_puzzle2)
 find_package(Boost COMPONENTS program_options REQUIRED)
 
+option(USE_EMBEDDED_PLATFORM_FOLDERS "Use the embedded version of PlatformFolders" ON)
+
 #Setup SDL2
 find_package(SDL2 REQUIRED CONFIG)
 include_directories(${SDL2_INCLUDE_DIRS})
@@ -17,7 +19,7 @@ include_directories(${SDL2TTF_INCLUDE_DIRS})
 pkg_search_module(SDL2GFX REQUIRED SDL2_gfx)
 include_directories(${SDL2GFX_INCLUDE_DIRS})
 
-if (SALAND_USE_EMBEDDED_PLATFORM_FOLDERS)
+if (USE_EMBEDDED_PLATFORM_FOLDERS)
 	message("Using embedded PlatformFolders")
 	add_subdirectory("embedded_libs/PlatformFolders-4.2.0" EXCLUDE_FROM_ALL)
 	message("Done processing PlatformFolders")
