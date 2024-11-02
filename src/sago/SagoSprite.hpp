@@ -95,6 +95,9 @@ public:
 	SagoSprite& operator=(const SagoSprite& base);
 	int GetWidth() const;
 	int GetHeight() const;
+	int GetTopX() const;
+	int GetTopY() const;
+	const std::string GetTextureName() const;
 	~SagoSprite();
 private:
 	struct SagoSpriteData;

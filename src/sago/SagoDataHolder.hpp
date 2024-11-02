@@ -41,6 +41,7 @@ public:
 	TextureHandler() {};
 	TextureHandler(const SagoDataHolder* holder, const std::string &textureName);
 	SDL_Texture* get();
+	std::string GetTextureName() const;
 private:
 	std::string textureName;
 	const SagoDataHolder* holder = nullptr;

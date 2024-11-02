@@ -43,9 +43,11 @@ public:
 	void Init();
 
 	void runTextureSelectorFrame(SDL_Renderer* target);
+	void runSpriteSelectorFrame(SDL_Renderer* target);
 
 private:
 	bool isActive = true;
 	std::vector<std::string> textures;
 	std::string selected_texture;
+	std::string selected_sprite;
 };

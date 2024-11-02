@@ -15,13 +15,11 @@ static void addLinesToCanvas(SDL_Renderer* renderer, SDL_Texture* texture, int x
 	SDL_SetRenderDrawColor(renderer, 255, 0, 0, SDL_ALPHA_OPAQUE);
 	if (xstep > 0) {
 		for (int i = 0; i < width+1; i += xstep) {
-			//SDL_RenderDrawLine(renderer, i, 0, i, height);
 			ImGui::GetWindowDrawList()->AddLine(ImVec2(i+xoffset, yoffset), ImVec2(i+xoffset, height+yoffset), IM_COL32(255, 0, 0, 255));
 		}
 	}
 	if (ystep > 0) {
 		for (int i = 0; i < height+1; i += ystep) {
-			//SDL_RenderDrawLine(renderer, 0, i, width, i);
 			ImGui::GetWindowDrawList()->AddLine(ImVec2(xoffset, i+yoffset), ImVec2(width+xoffset, i+yoffset), IM_COL32(255, 0, 0, 255));
 		}
 	}
@@ -47,6 +45,50 @@ static std::vector<std::string> populateTree(const std::string& filter = "") {
 std::string remove_file_extension(const std::string& filename) {
 	size_t lastindex = filename.find_last_of(".");
 	return filename.substr(0, lastindex);
+}
+
+void SagoTextureSelector::runSpriteSelectorFrame(SDL_Renderer* target) {
+	ImGui::Begin("SpriteList", nullptr, ImGuiWindowFlags_NoCollapse);
+	static char filter[256] = "";
+	ImGui::InputText("Filter", filter, IM_ARRAYSIZE(filter));
+	ImGui::Separator();
+	const std::unordered_map<std::string,std::shared_ptr<sago::SagoSprite>>& sprites = globalData.spriteHolder->GetSprites();
+	for (const auto& sprite : sprites) {
+		std::string sprite_name = sprite.first;
+		if (filter[0] == '\0' || sprite_name.find(filter) != std::string::npos) {
+			if (ImGui::Selectable(sprite_name.c_str(), selected_sprite == sprite_name)) {
+				selected_sprite = sprite_name;
+			}
+		}
+	}
+
+	ImGui::End();
+
+	ImGui::Begin("SpriteViewer");
+	if (selected_sprite.length()) {
+		int tex_w, tex_h;
+		const sago::SagoSprite& current_sprite = globalData.spriteHolder->GetSprite(selected_sprite);
+		SDL_Texture* current_texture = globalData.dataHolder->getTexturePtr(current_sprite.GetTextureName());
+		SDL_QueryTexture(current_texture, nullptr, nullptr, &tex_w, &tex_h);
+		float sprite_w = current_sprite.GetWidth();
+		float sprite_h = current_sprite.GetHeight();
+		float topx = current_sprite.GetTopX();
+		float topy = current_sprite.GetTopY();
+		ImGui::Text("Size: %d x %d", tex_w, tex_h);
+		ImGui::BeginChild("Test");
+		ImVec2 p = ImGui::GetCursorScreenPos();
+
+		// Normalized coordinates of pixel (10,10) in a 256x256 texture.
+		ImVec2 uv0 = ImVec2(topx / tex_h, topy / tex_w);
+
+		// Normalized coordinates of pixel (110,210) in a 256x256 texture.
+		ImVec2 uv1 = ImVec2( (topx+sprite_h) / tex_h, (topy+sprite_w) / tex_w);
+
+
+		ImGui::Image((ImTextureID)(intptr_t)current_texture, ImVec2((float)sprite_w, (float)sprite_h), uv0, uv1);
+		ImGui::EndChild();
+	}
+	ImGui::End();
 }
 
 void SagoTextureSelector::runTextureSelectorFrame(SDL_Renderer* target) {
@@ -98,6 +140,7 @@ void SagoTextureSelector::ProcessInput(const SDL_Event& event, bool &processed) 
 
 void SagoTextureSelector::Draw(SDL_Renderer* target) {
 	runTextureSelectorFrame(target);
+	runSpriteSelectorFrame(target);
 }
 
 void SagoTextureSelector::Update() {

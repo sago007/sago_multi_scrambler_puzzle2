@@ -27,7 +27,9 @@ SOFTWARE.
 
 #include "SagoDataHolder.hpp"
 #include "SagoSprite.hpp"
+#include <memory>
 #include <vector>
+#include <unordered_map>
 
 namespace sago {
 
@@ -45,6 +47,7 @@ public:
 	void ReadSprites(const std::vector<std::string>& extra_sprites);
 	const sago::SagoSprite& GetSprite(const std::string &spritename) const;
 	const SagoDataHolder& GetDataHolder() const;
+	const std::unordered_map<std::string,std::shared_ptr<sago::SagoSprite>>& GetSprites() const;
 private:
 	SagoSpriteHolder(const SagoSpriteHolder& base) = delete;
 	SagoSpriteHolder& operator=(const SagoSpriteHolder& base) = delete;

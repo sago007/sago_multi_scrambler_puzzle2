@@ -174,4 +174,17 @@ int SagoSprite::GetHeight() const {
 	return data->imgCord.h;
 }
 
+int SagoSprite::GetTopX() const {
+	return data->imgCord.x;
+}
+
+int SagoSprite::GetTopY() const {
+	return data->imgCord.y;
+}
+
+
+const std::string SagoSprite::GetTextureName() const {
+	return data->tex.GetTextureName();
+}
+
 }  //namespace sago

@@ -263,6 +263,10 @@ SDL_Texture* TextureHandler::get() {
 	return data;
 }
 
+std::string TextureHandler::GetTextureName() const {
+	return textureName;
+}
+
 
 MusicHandler::MusicHandler(const SagoDataHolder* holder, const std::string& musicName) {
 	this->holder = holder;
