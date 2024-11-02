@@ -81,7 +81,6 @@ void SagoSprite::DrawScaled(SDL_Renderer* target, Sint32 frameTime, int x, int y
 void SagoSprite::DrawScaledAndRotated(SDL_Renderer* target, Sint32 frameTime, int x, int y, int w, int h, const double angleRadian, const SDL_Point* center, const SDL_RendererFlip flip) const {
 	if (!data->tex.get()) {
 		std::cerr << "Texture is null!\n";
-		return;
 	}
 	SDL_Rect rect = data->imgCord;
 	rect.x+=rect.w*((frameTime/data->aniFrameTime)%data->aniFrames);
@@ -172,19 +171,6 @@ int SagoSprite::GetWidth() const {
 }
 int SagoSprite::GetHeight() const {
 	return data->imgCord.h;
-}
-
-int SagoSprite::GetTopX() const {
-	return data->imgCord.x;
-}
-
-int SagoSprite::GetTopY() const {
-	return data->imgCord.y;
-}
-
-
-const std::string SagoSprite::GetTextureName() const {
-	return data->tex.GetTextureName();
 }
 
 }  //namespace sago

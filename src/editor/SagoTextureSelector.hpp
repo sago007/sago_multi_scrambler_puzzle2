@@ -24,6 +24,7 @@ https://github.com/sago007/saland
 #include "../../sago/GameStateInterface.hpp"
 #include <vector>
 #include <string>
+#include "editor_loader.hpp"
 
 
 
@@ -48,6 +49,7 @@ public:
 private:
 	bool isActive = true;
 	std::vector<std::string> textures;
+	std::map<std::string,SagoSprite> sprites;
 	std::string selected_texture;
 	std::string selected_sprite;
 };

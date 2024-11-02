@@ -1,7 +1,7 @@
 /*
 ===========================================================================
  * Sago Multi Scrambler Puzzle
-Copyright (C) 2022 Poul Sander
+Copyright (C) 2022-2024 Poul Sander
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -103,6 +103,7 @@ int main(int argc, const char* argv[]) {
 		std::cout << GAMENAME << " " << VERSION_NUMBER << "\n";
 		return 0;
 	}
+	
 	InitSagoFS(argc, argv);
 	if (vm.count("input-file")) {
 		const std::vector<std::string>& input_files = vm["input-file"].as<std::vector<std::string> >();

@@ -24,6 +24,8 @@ SOFTWARE.
 
 #include "SagoSpriteHolder.hpp"
 #include "SagoMisc.hpp"
+#include <memory>
+#include <unordered_map>
 #include "rapidjson/document.h"
 #include <iostream>
 #include <string.h>
@@ -146,12 +148,9 @@ const sago::SagoSprite& SagoSpriteHolder::GetSprite(const std::string& spritenam
 	}
 }
 
+
 const SagoDataHolder& SagoSpriteHolder::GetDataHolder() const {
 	return *data->tex;
-}
-
-const std::unordered_map<std::string,std::shared_ptr<sago::SagoSprite>>& SagoSpriteHolder::GetSprites() const {
-	return data->sprites;
 }
 
 }

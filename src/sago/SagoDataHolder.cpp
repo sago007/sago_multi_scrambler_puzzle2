@@ -114,7 +114,12 @@ SDL_Texture* SagoDataHolder::getTexturePtr(const std::string& textureName) const
 		printFileWeLoad(path);
 	}
 	if (!PHYSFS_exists(path.c_str())) {
-		sago::SagoFatalErrorF("getTextureFailed - Texture does not exist: %s", path.c_str());
+		// We did not find the png file. Try to see if there are a jpg file.
+		std::string jpg_path = "textures/"+textureName+".jpg";
+		if (!PHYSFS_exists(jpg_path.c_str())) {
+			sago::SagoFatalErrorF("getTextureFailed - Texture does not exist: %s", path.c_str());
+		}
+		path = jpg_path;
 	}
 	unsigned int m_size = 0;
 	std::unique_ptr<char[]> m_data;
@@ -245,7 +250,7 @@ Uint64 SagoDataHolder::getVersion() const {
 	return data->version;
 }
 
-TextureHandler::TextureHandler(const SagoDataHolder* holder, const std::string &textureName) {
+TextureHandler::TextureHandler(const SagoDataHolder* holder, const std::string& textureName) {
 	this->holder = holder;
 	this->version = 0;
 	this->textureName = textureName;
@@ -253,18 +258,11 @@ TextureHandler::TextureHandler(const SagoDataHolder* holder, const std::string &
 }
 
 SDL_Texture* TextureHandler::get() {
-	if (!holder) {
-		return nullptr;
-	}
 	if (version != holder->getVersion()) {
 		//The holder has been invalidated
 		this->data = this->holder->getTexturePtr(textureName);
 	}
 	return data;
-}
-
-std::string TextureHandler::GetTextureName() const {
-	return textureName;
 }
 
 
@@ -299,15 +297,15 @@ Mix_Chunk* SoundHandler::get() {
 }
 
 
-TextureHandler SagoDataHolder::getTextureHandler(const std::string &textureName) const {
+TextureHandler SagoDataHolder::getTextureHandler(const std::string& textureName) const {
 	return TextureHandler(this, textureName);
 }
 
-MusicHandler SagoDataHolder::getMusicHandler(const std::string &musicName) const {
+MusicHandler SagoDataHolder::getMusicHandler(const std::string& musicName) const {
 	return MusicHandler(this, musicName);
 }
 
-SoundHandler SagoDataHolder::getSoundHandler(const std::string &soundName) const {
+SoundHandler SagoDataHolder::getSoundHandler(const std::string& soundName) const {
 	return SoundHandler(this, soundName);
 }
 
