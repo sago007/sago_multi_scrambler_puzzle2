@@ -49,6 +49,17 @@ static void addLinesToCanvas(SDL_Renderer* renderer, SDL_Texture* texture, int x
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
 }
 
+static void addRectableToCanvas(SDL_Renderer* renderer, int topx = 0, int topy = 0, int height = 100, int width = 100, int xoffset = 0, int yoffset = 0) {
+	SDL_SetRenderDrawColor(renderer, 255, 0, 0, SDL_ALPHA_OPAQUE);
+	topx += xoffset;
+	topy += yoffset;
+	ImGui::GetWindowDrawList()->AddLine(ImVec2(topx, topy), ImVec2(topx+width, topy), IM_COL32(255, 0, 0, 255));
+	ImGui::GetWindowDrawList()->AddLine(ImVec2(topx+width, topy), ImVec2(topx+width, topy+height), IM_COL32(255, 0, 0, 255));
+	ImGui::GetWindowDrawList()->AddLine(ImVec2(topx+width, topy+height), ImVec2(topx, topy+height), IM_COL32(255, 0, 0, 255));
+	ImGui::GetWindowDrawList()->AddLine(ImVec2(topx, topy+height), ImVec2(topx, topy), IM_COL32(255, 0, 0, 255));
+	SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
+}
+
 static void addFolderToList(const std::string& folder, std::vector<std::string>& list, const std::string& filter = "") {
 	std::vector<std::string> textures = sago::GetFileList(folder.c_str());
 	for (const auto& texture : textures) {
@@ -108,6 +119,21 @@ void SagoTextureSelector::runSpriteSelectorFrame(SDL_Renderer* target) {
 
 
 		ImGui::Image((ImTextureID)(intptr_t)current_texture, ImVec2((float)sprite_w, (float)sprite_h), uv0, uv1);
+		ImGui::EndChild();
+	}
+	ImGui::End();
+
+	ImGui::Begin("SpriteTexture");
+	if (selected_sprite.length() && sprites[selected_sprite].texture.length()) {
+		int tex_w, tex_h;
+		const SagoSprite& current_sprite = sprites[selected_sprite];
+		SDL_Texture* current_texture = globalData.dataHolder->getTexturePtr(current_sprite.texture);
+		SDL_QueryTexture(current_texture, nullptr, nullptr, &tex_w, &tex_h);
+		ImGui::Text("Size: %d x %d", tex_w, tex_h);
+		ImGui::BeginChild("Test");
+		ImVec2 p = ImGui::GetCursorScreenPos();
+		ImGui::Image((ImTextureID)(intptr_t)current_texture, ImVec2((float)tex_w, (float)tex_h));
+		addRectableToCanvas(target, current_sprite.topx, current_sprite.topy, current_sprite.height, current_sprite.width,  p.x, p.y);
 		ImGui::EndChild();
 	}
 	ImGui::End();
