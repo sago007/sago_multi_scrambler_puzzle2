@@ -25,6 +25,7 @@ https://github.com/sago007/saland
 #include "SDL.h"
 #include <string>
 #include <vector>
+#include "rhash.h"
 
 class PuzzleSingleImageState : public sago::GameStateInterface {
 public:
@@ -71,4 +72,5 @@ private:
 	std::vector<size_t> shuffeled_pieces;
 	std::vector<size_t> rotated_pieces;
 	int marked_piece = -1;
+	std::string picture_id = "";
 };

@@ -36,5 +36,5 @@ file(GLOB SOURCES "src/*.cpp" "src/*/*.cpp" "src/*/*/*.cpp" "src/*/*/*/*.cpp" "s
 add_executable(sago_multi_scrambler_puzzle2 ${SOURCES})
 TARGET_LINK_LIBRARIES( sago_multi_scrambler_puzzle2 ${Boost_LIBRARIES} )
 target_link_libraries( sago_multi_scrambler_puzzle2 ${SDL2_LIBRARIES})
-target_link_libraries( sago_multi_scrambler_puzzle2 physfs platform_folders)
+target_link_libraries( sago_multi_scrambler_puzzle2 physfs platform_folders rhash)
 target_link_libraries( sago_multi_scrambler_puzzle2 ${SDL2MIXER_LIBRARIES} ${SDL2IMAGE_LIBRARIES} ${SDL2TTF_LIBRARIES} ${SDL2GFX_LIBRARIES})

@@ -28,6 +28,7 @@ https://github.com/sago007/saland
 #include <SDL2/SDL2_gfxPrimitives.h>
 #include <time.h>
 #include "SagoImGui.hpp"
+#include "rhash.hpp"
 
 PuzzleSingleImageState::PuzzleSingleImageState() {
 	
@@ -210,11 +211,14 @@ void PuzzleSingleImageState::LoadPictureFromFile(const std::string& filename, SD
 		std::cerr << "Failed to load " << filename << std::endl;
 		return;
 	}
+	RHash h(RHASH_SHA256);
+	h.update(filename);
+	picture_id = h.hex(RHASH_SHA256);
 	source_image_height = bitmapSurface->h;
 	source_image_width = bitmapSurface->w;
 	ResizeImage();
 	this->pictureTex = SDL_CreateTextureFromSurface(renderer, bitmapSurface);
-	std::cerr << resized_image_logical_width << ", " << resized_image_logical_height << "\n";
+	std::cerr << resized_image_logical_width << ", " << resized_image_logical_height << ", id: " << picture_id << ", file: " << filename << "\n";
 	SDL_FreeSurface(bitmapSurface);
 	pieces_logical.clear();
 	SDL_Rect piece;
@@ -284,6 +288,7 @@ void PuzzleSingleImageState::ClearPicture() {
 		SDL_DestroyTexture(this->pictureTex);
 		this->pictureTex = nullptr;
 	}
+	picture_id = "";
 }
 
 void PuzzleSingleImageState::Shuffle() {

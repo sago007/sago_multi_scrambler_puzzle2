@@ -34,6 +34,7 @@ https://github.com/sago007/saland
 #include "MainGameState.hpp"
 #include "editor/SagoTextureSelector.hpp"
 #include "version.h"
+#include <filesystem>
 
 
 GlobalData globalData;
@@ -107,7 +108,13 @@ int main(int argc, const char* argv[]) {
 	InitSagoFS(argc, argv);
 	if (vm.count("input-file")) {
 		const std::vector<std::string>& input_files = vm["input-file"].as<std::vector<std::string> >();
-		runSinglePuzzle(input_files.at(0));
+		std::filesystem::path p = input_files.at(0);
+		std::error_code ec;
+		std::string filename = std::filesystem::canonical(p, ec).string();
+		if (ec) {
+			std::cerr << "Failed to open file: " << input_files.at(0) << "\n";
+		}
+		runSinglePuzzle(filename);
 		return 0;
 	}
 	if (vm.count("collection")) {
