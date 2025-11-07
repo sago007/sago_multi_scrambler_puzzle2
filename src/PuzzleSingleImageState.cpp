@@ -27,6 +27,8 @@ https://github.com/sago007/saland
 #include "globals.hpp"
 #include <SDL2/SDL2_gfxPrimitives.h>
 #include <time.h>
+#include <cmath>
+#include <random>
 #include "SagoImGui.hpp"
 #include "rhash.hpp"
 
@@ -125,10 +127,20 @@ void PuzzleSingleImageState::Draw(SDL_Renderer* target) {
 		ImGui::EndMenu();
 	}
 	ImGui::EndMainMenuBar();
+
+	// Draw confetti on top of everything
+	DrawConfetti(target);
 }
 
 
 void PuzzleSingleImageState::Update() {
+	// Update confetti animation
+	static Uint32 lastTime = SDL_GetTicks();
+	Uint32 currentTime = SDL_GetTicks();
+	float deltaTime = (currentTime - lastTime) / 1000.0f;
+	lastTime = currentTime;
+	UpdateConfetti(deltaTime);
+
 	// If the mouse button is released, make bMouseUp equal true
 	if ( !(SDL_GetMouseState(nullptr, nullptr)&SDL_BUTTON(1)) ) {
 		globalData.mouseUp=true;
@@ -311,10 +323,13 @@ void PuzzleSingleImageState::Shuffle() {
 		}
 	}
 	shuffeled = true;
+	puzzleSolved = false;  // Reset solved state when shuffling
+	confetti.clear();       // Clear any existing confetti
 }
 
 
 void PuzzleSingleImageState::CheckSolved() {
+	bool wasSolved = !shuffeled;
 	for (size_t i=0; i < shuffeled_pieces.size(); ++i) {
 		if (rotated_pieces[i] != 0) {
 			return;
@@ -324,4 +339,109 @@ void PuzzleSingleImageState::CheckSolved() {
 		}
 	}
 	shuffeled = false;
+
+	// If puzzle just became solved, trigger confetti
+	if (!wasSolved && !puzzleSolved) {
+		puzzleSolved = true;
+		InitConfetti();
+	}
+}
+
+void PuzzleSingleImageState::InitConfetti() {
+	confetti.clear();
+
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::uniform_real_distribution<float> xDist(0.0f, static_cast<float>(globalData.xsize));
+	std::uniform_real_distribution<float> yDist(-100.0f, 0.0f);
+	std::uniform_real_distribution<float> vxDist(-100.0f, 100.0f);
+	std::uniform_real_distribution<float> vyDist(50.0f, 200.0f);
+	std::uniform_real_distribution<float> rotDist(0.0f, 360.0f);
+	std::uniform_real_distribution<float> rotSpeedDist(-360.0f, 360.0f);
+	std::uniform_real_distribution<float> sizeDist(4.0f, 12.0f);
+	std::uniform_real_distribution<float> gravityDist(100.0f, 300.0f);
+	std::uniform_int_distribution<int> colorDist(0, 255);
+
+	// Create colorful confetti particles
+	const int numParticles = 200;
+	for (int i = 0; i < numParticles; ++i) {
+		ConfettiParticle particle;
+		particle.x = xDist(gen);
+		particle.y = yDist(gen);
+		particle.vx = vxDist(gen);
+		particle.vy = vyDist(gen);
+		particle.rotation = rotDist(gen);
+		particle.rotationSpeed = rotSpeedDist(gen);
+		particle.size = sizeDist(gen);
+		particle.lifetime = 5.0f;  // 5 seconds
+		particle.gravity = gravityDist(gen);
+
+		// Bright, saturated colors
+		int colorChoice = i % 6;
+		switch (colorChoice) {
+			case 0: particle.r = 255; particle.g = 0; particle.b = 0; break;      // Red
+			case 1: particle.r = 0; particle.g = 255; particle.b = 0; break;      // Green
+			case 2: particle.r = 0; particle.g = 0; particle.b = 255; break;      // Blue
+			case 3: particle.r = 255; particle.g = 255; particle.b = 0; break;    // Yellow
+			case 4: particle.r = 255; particle.g = 0; particle.b = 255; break;    // Magenta
+			case 5: particle.r = 0; particle.g = 255; particle.b = 255; break;    // Cyan
+		}
+
+		confetti.push_back(particle);
+	}
+}
+
+void PuzzleSingleImageState::UpdateConfetti(float deltaTime) {
+	// Update all confetti particles
+	for (auto it = confetti.begin(); it != confetti.end();) {
+		it->lifetime -= deltaTime;
+
+		if (it->lifetime <= 0.0f) {
+			it = confetti.erase(it);
+		} else {
+			// Update position
+			it->x += it->vx * deltaTime;
+			it->y += it->vy * deltaTime;
+
+			// Apply gravity
+			it->vy += it->gravity * deltaTime;
+
+			// Update rotation
+			it->rotation += it->rotationSpeed * deltaTime;
+
+			// Add some air resistance
+			it->vx *= 0.99f;
+
+			++it;
+		}
+	}
+}
+
+void PuzzleSingleImageState::DrawConfetti(SDL_Renderer* target) {
+	for (const auto& particle : confetti) {
+		// Calculate alpha based on lifetime (fade out in last second)
+		Uint8 alpha = 255;
+		if (particle.lifetime < 1.0f) {
+			alpha = static_cast<Uint8>(255 * particle.lifetime);
+		}
+
+		// Draw confetti as small filled rectangles
+		float halfSize = particle.size / 2.0f;
+		float angle = particle.rotation * M_PI / 180.0f;
+
+		// Simple rectangle for confetti pieces
+		Sint16 x1 = static_cast<Sint16>(particle.x - halfSize * std::cos(angle));
+		Sint16 y1 = static_cast<Sint16>(particle.y - halfSize * std::sin(angle));
+		Sint16 x2 = static_cast<Sint16>(particle.x + halfSize * std::cos(angle));
+		Sint16 y2 = static_cast<Sint16>(particle.y + halfSize * std::sin(angle));
+		Sint16 x3 = static_cast<Sint16>(particle.x + halfSize * std::cos(angle) - halfSize * std::sin(angle));
+		Sint16 y3 = static_cast<Sint16>(particle.y + halfSize * std::sin(angle) + halfSize * std::cos(angle));
+		Sint16 x4 = static_cast<Sint16>(particle.x - halfSize * std::cos(angle) - halfSize * std::sin(angle));
+		Sint16 y4 = static_cast<Sint16>(particle.y - halfSize * std::sin(angle) + halfSize * std::cos(angle));
+
+		// Draw a filled polygon (quad)
+		Sint16 vx[] = {x1, x2, x3, x4};
+		Sint16 vy[] = {y1, y2, y3, y4};
+		filledPolygonRGBA(target, vx, vy, 4, particle.r, particle.g, particle.b, alpha);
+	}
 }
