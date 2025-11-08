@@ -26,6 +26,7 @@ https://github.com/sago007/saland
 #include <string>
 #include <vector>
 #include "rhash.h"
+#include "Confetti.hpp"
 
 class PuzzleSingleImageState : public sago::GameStateInterface {
 public:
@@ -53,25 +54,11 @@ public:
 
 	bool flipMode = false;
 private:
-	struct ConfettiParticle {
-		float x, y;           // Position
-		float vx, vy;         // Velocity
-		float rotation;       // Rotation angle
-		float rotationSpeed;  // Rotation speed
-		Uint8 r, g, b;       // Color
-		float size;          // Size of the confetti
-		float lifetime;      // Time to live
-		float gravity;       // Gravity multiplier
-	};
-
 	void ClearPicture();
-	void InitConfetti();
-	void UpdateConfetti(float deltaTime);
-	void DrawConfetti(SDL_Renderer* target);
 
 	bool isActive = true;
 	bool puzzleSolved = false;
-	std::vector<ConfettiParticle> confetti;
+	Confetti confetti;
 	SDL_Texture* pictureTex = NULL;
 	int source_image_height = 1;
 	int source_image_width = 1;
