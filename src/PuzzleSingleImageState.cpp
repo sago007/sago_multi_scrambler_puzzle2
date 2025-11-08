@@ -124,6 +124,13 @@ void PuzzleSingleImageState::Draw(SDL_Renderer* target) {
 		}
 		ImGui::EndMenu();
 	}
+	if (ImGui::BeginMenu("Settings")) {
+		if (ImGui::MenuItem("Flip Mode", nullptr, flipMode)) {
+			flipMode = !flipMode;
+			Shuffle();
+		}
+		ImGui::EndMenu();
+	}
 	ImGui::EndMainMenuBar();
 
 	confetti.Draw(target);
