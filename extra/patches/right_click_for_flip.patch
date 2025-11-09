@@ -1,0 +1,69 @@
+diff --git a/src/PuzzleSingleImageState.cpp b/src/PuzzleSingleImageState.cpp
+index 600ec68..8d730df 100644
+--- a/src/PuzzleSingleImageState.cpp
++++ b/src/PuzzleSingleImageState.cpp
+@@ -149,22 +149,36 @@ void PuzzleSingleImageState::Update() {
+ 		globalData.mouseUp=true;
+ 	}
+ 
++	if ( !(SDL_GetMouseState(nullptr, nullptr)&SDL_BUTTON(3)) ) {
++		globalData.mouseRightUp=true;
++	}
++
++	bool leftClicked = false;
++	bool rightClicked = false;
+ 	if (SDL_GetMouseState(nullptr,nullptr)&SDL_BUTTON(1) && globalData.mouseUp) {
++		leftClicked = true;
+ 		globalData.mouseUp = false;
+-		
++	}
++
++	if (SDL_GetMouseState(nullptr,nullptr)&SDL_BUTTON(3) && globalData.mouseRightUp) {
++		rightClicked = true;
++		globalData.mouseRightUp = false;
++	}
++
++	if (leftClicked || rightClicked) {
+ 		SDL_Rect rect;
+ 		rect.x = globalData.xsize/2-resized_image_physical_width/2;
+-		rect.y = globalData.ysize/2-resized_image_physical_height/2;;
++		rect.y = globalData.ysize/2-resized_image_physical_height/2;
+ 		rect.h = resized_image_physical_height;
+ 		rect.w = resized_image_physical_width;
+ 		for (size_t i = 0; i< pieces_physical.size(); ++i) {
+ 			const SDL_Rect& piece = pieces_physical[i];
+ 			bool clicked = (globalData.mousex > rect.x+piece.x && globalData.mousex < rect.x+piece.x + piece.w && globalData.mousey > rect.y+piece.y && globalData.mousey < rect.y+piece.y + piece.h);
+ 			if (clicked) {
+-				if (flipMode) {
++				if (rightClicked && flipMode) {
+ 					rotated_pieces[i] = (rotated_pieces[i]+1)%4;
+ 				}
+-				else {
++				if (leftClicked && !flipMode) {
+ 					if (i != marked_piece && marked_piece > -1 && marked_piece < pieces_physical.size()) {
+ 						std::swap(shuffeled_pieces[i], shuffeled_pieces[marked_piece]);
+ 						marked_piece = -1;
+@@ -180,6 +194,11 @@ void PuzzleSingleImageState::Update() {
+ 		}
+ 		CheckSolved();
+ 	}
++
++	if (SDL_GetMouseState(nullptr,nullptr)&SDL_BUTTON(2) && globalData.mouseRightUp) {
++		globalData.mouseRightUp = false;
++		marked_piece = -1;
++	}
+ }
+ 
+ void PuzzleSingleImageState::CreatePhysicalPieces() {
+diff --git a/src/globals.hpp b/src/globals.hpp
+index fa6c6e7..a31d084 100644
+--- a/src/globals.hpp
++++ b/src/globals.hpp
+@@ -42,6 +42,7 @@ struct GlobalData {
+ 	int mousex = 0;
+ 	int mousey = 0;
+ 	bool mouseUp = false;
++	bool mouseRightUp = false;
+ 	int xsize = 1366;
+ 	int ysize = 768;
+ };
