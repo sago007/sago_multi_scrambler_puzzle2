@@ -69,7 +69,10 @@ static void DrawRectYellow(SDL_Renderer* target, int topx, int topy, int height,
 }
 
 ImageSelectState::ImageSelectState() {
-
+	// Set up logical resolution for scalability
+	// Using 1280x720 as the base logical resolution
+	logicalResize = sago::SagoLogicalResize(1280, 720);
+	logicalResize.SetPhysicalSize(globalData.xsize, globalData.ysize);
 }
 
 
@@ -81,27 +84,65 @@ bool ImageSelectState::IsActive() {
 }
 
 void ImageSelectState::ProcessInput(const SDL_Event& event, bool &processed) {
+	if (event.type == SDL_WINDOWEVENT) {
+		if (event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {
+			logicalResize.SetPhysicalSize(globalData.xsize, globalData.ysize);
+		}
+	}
 	ImGui_ImplSDL2_ProcessEvent(&event);
 }
 
 void ImageSelectState::Draw(SDL_Renderer* target) {
+	// Logical coordinates for the layout
+	const int logical_width = 1280;
+	const int logical_height = 720;
 	const int number_of_images_per_page = 6;
 	const int frame_size = 300;
 	const int frame_spacing = 20;
 	const int frame_border = 10;
 	const int number_of_columns = 3;
-	const int top_x = (globalData.xsize-(3*frame_size+2*frame_spacing))/2;
-	const int top_y = (globalData.ysize-(2*frame_size+frame_spacing))/2;
+	const int top_x_logical = (logical_width - (3 * frame_size + 2 * frame_spacing)) / 2;
+	const int top_y_logical = (logical_height - (2 * frame_size + frame_spacing)) / 2;
+
 	for (int i = 0; i < number_of_images_per_page; ++i) {
 		int x = i % number_of_columns;
 		int y = i / number_of_columns;
-		DrawRectYellow(target, top_x+x*(frame_size+frame_spacing), top_y+y*(frame_size+frame_spacing), frame_size, frame_size);
+
+		// Calculate logical rectangle for this frame
+		SDL_Rect frame_logical;
+		frame_logical.x = top_x_logical + x * (frame_size + frame_spacing);
+		frame_logical.y = top_y_logical + y * (frame_size + frame_spacing);
+		frame_logical.w = frame_size;
+		frame_logical.h = frame_size;
+
+		// Convert entire rectangle to physical coordinates
+		SDL_Rect frame_physical = frame_logical;
+		logicalResize.LogicalToPhysical(frame_physical);
+
+		// Calculate border in physical coordinates
+		SDL_Rect border_logical = {0, 0, frame_border, frame_border};
+		SDL_Rect border_physical = border_logical;
+		logicalResize.LogicalToPhysical(border_physical);
+		int border_physical_w = border_physical.w;
+		int border_physical_h = border_physical.h;
+
+		DrawRectYellow(target, frame_physical.x, frame_physical.y, frame_physical.h, frame_physical.w);
 		size_t image_number = i + firstImage;
 		if (image_number < imageHolders.size()) {
-			imageHolders[image_number].Draw(target, top_x+x*(frame_size+frame_spacing)+frame_border, top_y+y*(frame_size+frame_spacing)+frame_border, frame_size-2*frame_border, frame_size-2*frame_border);
+			imageHolders[image_number].Draw(target,
+				frame_physical.x + border_physical_w,
+				frame_physical.y + border_physical_h,
+				frame_physical.w - 2 * border_physical_w,
+				frame_physical.h - 2 * border_physical_h);
 		}
 		if (image_number < imageNameFields.size()) {
-			imageNameFields[image_number].Draw(target, top_x+x*(frame_size+frame_spacing)+frame_size/2, top_y+y*(frame_size+frame_spacing)+frame_size-5, sago::SagoTextField::Alignment::center, sago::SagoTextField::VerticalAlignment::bottom);
+			int text_x_physical, text_y_physical;
+			logicalResize.LogicalToPhysical(
+				frame_logical.x + frame_size / 2,
+				frame_logical.y + frame_size - 5,
+				text_x_physical, text_y_physical);
+			imageNameFields[image_number].Draw(target, text_x_physical, text_y_physical,
+				sago::SagoTextField::Alignment::center, sago::SagoTextField::VerticalAlignment::bottom);
 		}
 	}
 
@@ -138,20 +179,34 @@ void ImageSelectState::Update() {
 	if (SDL_GetMouseState(nullptr,nullptr)&SDL_BUTTON(1) && globalData.mouseUp) {
 		globalData.mouseUp = false;
 
-		if (globalData.mousex > 0 && globalData.mousex < globalData.xsize && globalData.mousey > 0 && globalData.mousey < globalData.ysize) {
+		// Convert physical mouse coordinates to logical coordinates
+		int mouse_x_logical, mouse_y_logical;
+		logicalResize.PhysicalToLogical(globalData.mousex, globalData.mousey, mouse_x_logical, mouse_y_logical);
+
+		const int logical_width = 1280;
+		const int logical_height = 720;
+
+		if (mouse_x_logical > 0 && mouse_x_logical < logical_width &&
+		    mouse_y_logical > 0 && mouse_y_logical < logical_height) {
 			const int number_of_images_per_page = 6;
 			const int frame_size = 300;
 			const int frame_spacing = 20;
-			const int frame_border = 10;
 			const int number_of_columns = 3;
-			const int top_x = (globalData.xsize-(3*frame_size+2*frame_spacing))/2;
-			const int top_y = (globalData.ysize-(2*frame_size+frame_spacing))/2;
+			const int top_x_logical = (logical_width - (3 * frame_size + 2 * frame_spacing)) / 2;
+			const int top_y_logical = (logical_height - (2 * frame_size + frame_spacing)) / 2;
+
 			for (int i = 0; i < number_of_images_per_page; ++i) {
 				int x = i % number_of_columns;
 				int y = i / number_of_columns;
 				size_t image_number = i + firstImage;
-				if (globalData.mousex > top_x+x*(frame_size+frame_spacing) && globalData.mousex < top_x+x*(frame_size+frame_spacing)+frame_size &&
-						globalData.mousey > top_y+y*(frame_size+frame_spacing) && globalData.mousey < top_y+y*(frame_size+frame_spacing)+frame_size) {
+
+				int rect_x_logical = top_x_logical + x * (frame_size + frame_spacing);
+				int rect_y_logical = top_y_logical + y * (frame_size + frame_spacing);
+
+				if (mouse_x_logical > rect_x_logical &&
+				    mouse_x_logical < rect_x_logical + frame_size &&
+				    mouse_y_logical > rect_y_logical &&
+				    mouse_y_logical < rect_y_logical + frame_size) {
 					if (image_number < imageList.size()) {
 						printf("Clicked on image %s\n", imageList[image_number].c_str());
 						PuzzleSingleImageState psi;
@@ -168,9 +223,9 @@ void ImageSelectState::Update() {
 
 /**
  * @brief Compares two characters ignoring case
- * 
- * @param a 
- * @param b 
+ *
+ * @param a
+ * @param b
  * @return true if the characters are equal ignoring case
  * @return false if the characters are not equal ignoring case
  */
@@ -181,7 +236,7 @@ static bool ichar_equals(char a, char b) {
 
 /**
  * @brief Checks if the filename has the given extension. The comparison is case insensitive.
- * 
+ *
  * @param filename The filename to check
  * @param extension The extension to check for (example ".jpg")
  * @return true if the filename has the given extension

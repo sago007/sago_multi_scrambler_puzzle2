@@ -25,6 +25,7 @@ https://github.com/sago007/saland
 #include <string>
 #include <vector>
 #include "sago/SagoTextField.hpp"
+#include "sago/SagoLogicalResize.hpp"
 #include "ImageHolder.hpp"
 
 
@@ -52,5 +53,6 @@ public:
 
 private:
 	bool isActive = true;
+	sago::SagoLogicalResize logicalResize;
 };
 
