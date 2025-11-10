@@ -41,6 +41,7 @@ namespace sago {
  * - Physical coordinates: Actual screen/window size (e.g., 1280x720, 3840x2160, etc.)
  * - Scale factor: Calculated to fit logical size into physical size while preserving aspect ratio
  * - Margins: Black bars added to maintain aspect ratio (letterboxing/pillarboxing)
+ * - Tile alignment: As long as tiles are resized with LogicalToPhysical, they will align correctly. No gaps or overlaps.
  * 
  * Example usage:
  * @code
