@@ -36,7 +36,7 @@ bool MainGameState::IsActive() {
 	return true;
 }
 
-void MainGameState::ProcessInput(const SDL_Event& event, bool &processed) {
+void MainGameState::ProcessInput(const SDL_Event& event, bool& processed) {
 
 }
 

@@ -112,7 +112,8 @@ void ImageHolder::Draw(SDL_Renderer* target, int x, int y, int max_w, int max_h)
 	double aspect_ratio = static_cast<double>(imgWidth) / imgHeight;
 	if (max_w / aspect_ratio < max_h) {
 		max_h = static_cast<int>(max_w / aspect_ratio);
-	} else {
+	}
+	else {
 		max_w = static_cast<int>(max_h * aspect_ratio);
 	}
 

@@ -31,7 +31,7 @@ https://github.com/sago007/saland
 #include "rhash.hpp"
 
 PuzzleSingleImageState::PuzzleSingleImageState() {
-	
+
 }
 
 PuzzleSingleImageState::~PuzzleSingleImageState() {
@@ -43,20 +43,20 @@ bool PuzzleSingleImageState::IsActive() {
 }
 
 bool isEscapeEvent(const SDL_Event& event) {
-        if ( event.type == SDL_KEYDOWN ) {
-                if ( event.key.keysym.sym == SDLK_ESCAPE ) {
-                        return true;
-                }
-        }
-        if (event.type == SDL_CONTROLLERBUTTONDOWN) {
-                if (event.cbutton.button == SDL_CONTROLLER_BUTTON_B || event.cbutton.button == SDL_CONTROLLER_BUTTON_BACK ) {
-                        return true;
-                }
-        }
-        return false;
+	if ( event.type == SDL_KEYDOWN ) {
+		if ( event.key.keysym.sym == SDLK_ESCAPE ) {
+			return true;
+		}
+	}
+	if (event.type == SDL_CONTROLLERBUTTONDOWN) {
+		if (event.cbutton.button == SDL_CONTROLLER_BUTTON_B || event.cbutton.button == SDL_CONTROLLER_BUTTON_BACK ) {
+			return true;
+		}
+	}
+	return false;
 }
 
-void PuzzleSingleImageState::ProcessInput(const SDL_Event& event, bool &processed) {
+void PuzzleSingleImageState::ProcessInput(const SDL_Event& event, bool& processed) {
 	if (isEscapeEvent(event)) {
 		isActive = false;
 		processed = true;
@@ -104,12 +104,12 @@ void PuzzleSingleImageState::Draw(SDL_Renderer* target) {
 				continue;
 			}
 			rectangleRGBA(target, rect.x+piece.x, rect.y+piece.y,
-								rect.x+piece.x + piece.w, rect.y+piece.y + piece.h, 255, 255, 0, 255);
+			              rect.x+piece.x + piece.w, rect.y+piece.y + piece.h, 255, 255, 0, 255);
 		}
 		if (marked_piece > -1 && marked_piece < pieces_physical.size()) {
 			const SDL_Rect& piece = pieces_physical.at(marked_piece);
 			rectangleRGBA(target, rect.x+piece.x, rect.y+piece.y,
-								rect.x+piece.x + piece.w, rect.y+piece.y + piece.h, 255, 0, 0, 255);
+			              rect.x+piece.x + piece.w, rect.y+piece.y + piece.h, 255, 0, 0, 255);
 		}
 	}
 
@@ -151,7 +151,7 @@ void PuzzleSingleImageState::Update() {
 
 	if (SDL_GetMouseState(nullptr,nullptr)&SDL_BUTTON(1) && globalData.mouseUp) {
 		globalData.mouseUp = false;
-		
+
 		SDL_Rect rect;
 		rect.x = globalData.xsize/2-resized_image_physical_width/2;
 		rect.y = globalData.ysize/2-resized_image_physical_height/2;;

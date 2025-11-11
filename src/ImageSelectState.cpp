@@ -83,7 +83,7 @@ bool ImageSelectState::IsActive() {
 	return isActive;
 }
 
-void ImageSelectState::ProcessInput(const SDL_Event& event, bool &processed) {
+void ImageSelectState::ProcessInput(const SDL_Event& event, bool& processed) {
 	if (event.type == SDL_WINDOWEVENT) {
 		if (event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {
 			logicalResize.SetPhysicalSize(globalData.xsize, globalData.ysize);
@@ -130,19 +130,19 @@ void ImageSelectState::Draw(SDL_Renderer* target) {
 		size_t image_number = i + firstImage;
 		if (image_number < imageHolders.size()) {
 			imageHolders[image_number].Draw(target,
-				frame_physical.x + border_physical_w,
-				frame_physical.y + border_physical_h,
-				frame_physical.w - 2 * border_physical_w,
-				frame_physical.h - 2 * border_physical_h);
+			                                frame_physical.x + border_physical_w,
+			                                frame_physical.y + border_physical_h,
+			                                frame_physical.w - 2 * border_physical_w,
+			                                frame_physical.h - 2 * border_physical_h);
 		}
 		if (image_number < imageNameFields.size()) {
 			int text_x_physical, text_y_physical;
 			logicalResize.LogicalToPhysical(
-				frame_logical.x + frame_size / 2,
-				frame_logical.y + frame_size - 5,
-				text_x_physical, text_y_physical);
+			    frame_logical.x + frame_size / 2,
+			    frame_logical.y + frame_size - 5,
+			    text_x_physical, text_y_physical);
 			imageNameFields[image_number].Draw(target, text_x_physical, text_y_physical,
-				sago::SagoTextField::Alignment::center, sago::SagoTextField::VerticalAlignment::bottom);
+			                                   sago::SagoTextField::Alignment::center, sago::SagoTextField::VerticalAlignment::bottom);
 		}
 	}
 
@@ -156,7 +156,7 @@ void ImageSelectState::Draw(SDL_Renderer* target) {
 	ImGui::EndMainMenuBar();
 	ImGui::Begin("Page control");
 	if (ImGui::Button("Next page")) {
-        firstImage += number_of_images_per_page;
+		firstImage += number_of_images_per_page;
 	}
 	if (ImGui::Button("Previous page")) {
 		if (firstImage < number_of_images_per_page) {
@@ -187,7 +187,7 @@ void ImageSelectState::Update() {
 		const int logical_height = 720;
 
 		if (mouse_x_logical > 0 && mouse_x_logical < logical_width &&
-		    mouse_y_logical > 0 && mouse_y_logical < logical_height) {
+		        mouse_y_logical > 0 && mouse_y_logical < logical_height) {
 			const int number_of_images_per_page = 6;
 			const int frame_size = 300;
 			const int frame_spacing = 20;
@@ -204,9 +204,9 @@ void ImageSelectState::Update() {
 				int rect_y_logical = top_y_logical + y * (frame_size + frame_spacing);
 
 				if (mouse_x_logical > rect_x_logical &&
-				    mouse_x_logical < rect_x_logical + frame_size &&
-				    mouse_y_logical > rect_y_logical &&
-				    mouse_y_logical < rect_y_logical + frame_size) {
+				        mouse_x_logical < rect_x_logical + frame_size &&
+				        mouse_y_logical > rect_y_logical &&
+				        mouse_y_logical < rect_y_logical + frame_size) {
 					if (image_number < imageList.size()) {
 						printf("Clicked on image %s\n", imageList[image_number].c_str());
 						PuzzleSingleImageState psi;
@@ -230,8 +230,8 @@ void ImageSelectState::Update() {
  * @return false if the characters are not equal ignoring case
  */
 static bool ichar_equals(char a, char b) {
-    return std::tolower(static_cast<unsigned char>(a)) ==
-           std::tolower(static_cast<unsigned char>(b));
+	return std::tolower(static_cast<unsigned char>(a)) ==
+	       std::tolower(static_cast<unsigned char>(b));
 }
 
 /**
@@ -250,12 +250,12 @@ static bool HasExtension(const std::string& filename, const std::string& extensi
 }
 
 static void setFontText(const sago::SagoDataHolder* holder, sago::SagoTextField& field, const char* text) {
-        field.SetHolder(holder);
-        field.SetFont("freeserif");
-        field.SetColor({255,255,255,255});
-        field.SetFontSize(24);
-        field.SetOutline(1, {0,0,0,255});
-        field.SetText(text);
+	field.SetHolder(holder);
+	field.SetFont("freeserif");
+	field.SetColor({255,255,255,255});
+	field.SetFontSize(24);
+	field.SetOutline(1, {0,0,0,255});
+	field.SetText(text);
 }
 
 

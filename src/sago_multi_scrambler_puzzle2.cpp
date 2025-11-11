@@ -104,7 +104,7 @@ int main(int argc, const char* argv[]) {
 		std::cout << GAMENAME << " " << VERSION_NUMBER << "\n";
 		return 0;
 	}
-	
+
 	InitSagoFS(argc, argv);
 	if (vm.count("input-file")) {
 		const std::vector<std::string>& input_files = vm["input-file"].as<std::vector<std::string> >();

@@ -66,24 +66,24 @@ void RunGameState(sago::GameStateInterface& state ) {
 		bool mustWriteScreenshot = false;
 
 		while ( SDL_PollEvent(&event) ) {
-				UpdateMouseCoordinates(event, globalData.mousex, globalData.mousey);
-				if ( event.type == SDL_QUIT ) {
-						globalData.isShuttingDown = true;
-						done = true;
-				}
+			UpdateMouseCoordinates(event, globalData.mousex, globalData.mousey);
+			if ( event.type == SDL_QUIT ) {
+				globalData.isShuttingDown = true;
+				done = true;
+			}
 
-				if (event.type == SDL_WINDOWEVENT) {
-					if (event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {
-						SDL_GetRendererOutputSize(globalData.screen, &globalData.xsize, &globalData.ysize);
-					}
+			if (event.type == SDL_WINDOWEVENT) {
+				if (event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {
+					SDL_GetRendererOutputSize(globalData.screen, &globalData.xsize, &globalData.ysize);
 				}
+			}
 
-				if ( event.key.keysym.sym == SDLK_F9 ) {
-						mustWriteScreenshot = true;
-				}
+			if ( event.key.keysym.sym == SDLK_F9 ) {
+				mustWriteScreenshot = true;
+			}
 
-				bool processed = false;
-				state.ProcessInput(event, processed);
+			bool processed = false;
+			state.ProcessInput(event, processed);
 
 		}
 
@@ -170,7 +170,7 @@ void InitGame() {
 	io.IniFilename = nullptr;
 	imgui_inifile = getPathToSaveFiles() + "/imgui.ini";
 	ImGui::LoadIniSettingsFromDisk(imgui_inifile.c_str());
-	
+
 	dataHolder.invalidateAll(globalData.screen);
 	globalData.spriteHolder.reset(new sago::SagoSpriteHolder(dataHolder));
 	globalData.dataHolder = &dataHolder;
