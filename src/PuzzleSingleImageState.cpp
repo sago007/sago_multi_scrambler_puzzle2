@@ -29,9 +29,11 @@ https://github.com/sago007/saland
 #include <time.h>
 #include "SagoImGui.hpp"
 #include "rhash.hpp"
+#include "config.hpp"
 
 PuzzleSingleImageState::PuzzleSingleImageState() {
-
+	std::map<std::string, std::string> config = LoadConfigMap();
+	flipMode = GetConfigBool(config, "flipMode", false);
 }
 
 PuzzleSingleImageState::~PuzzleSingleImageState() {
@@ -127,6 +129,10 @@ void PuzzleSingleImageState::Draw(SDL_Renderer* target) {
 	if (ImGui::BeginMenu("Settings")) {
 		if (ImGui::MenuItem("Flip Mode", nullptr, flipMode)) {
 			flipMode = !flipMode;
+			// Save the updated configuration
+			std::map<std::string, std::string> config = LoadConfigMap();
+			SetConfigBool(config, "flipMode", flipMode);
+			SaveConfigMap(config);
 			Shuffle();
 		}
 		ImGui::EndMenu();

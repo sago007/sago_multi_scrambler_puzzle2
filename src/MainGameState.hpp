@@ -31,9 +31,9 @@ public:
 	MainGameState();
 	MainGameState(const MainGameState& orig) = delete;
 	virtual ~MainGameState();
-	
+
 	bool IsActive() override;
-	void ProcessInput(const SDL_Event& event, bool &processed) override;
+	void ProcessInput(const SDL_Event& event, bool& processed) override;
 	void Draw(SDL_Renderer* target) override;
 	void Update() override;
 
