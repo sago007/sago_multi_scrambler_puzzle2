@@ -319,12 +319,15 @@ void PuzzleSingleImageState::Shuffle() {
 	for (size_t i = 0; i< shuffeled_pieces.size(); ++i) {
 		shuffeled_pieces.at(i) = i;
 	}
-	if (flipMode) {
-		for (size_t i = 0; i< shuffeled_pieces.size(); ++i) {
+	for (size_t i = 0; i< shuffeled_pieces.size(); ++i) {
+		if (flipMode) {
 			rotated_pieces.at(i) = rand()%4;
 		}
+		else {
+			rotated_pieces.at(i) = 0;
+		}
 	}
-	else {
+	if (!flipMode) {
 		for (int i = 0 ; i < 100; ++i) {
 			size_t first = rand()%number_of_peices;
 			size_t second = rand()%number_of_peices;
