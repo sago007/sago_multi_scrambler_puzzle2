@@ -34,6 +34,7 @@ https://github.com/sago007/saland
 PuzzleSingleImageState::PuzzleSingleImageState() {
 	std::map<std::string, std::string> config = LoadConfigMap();
 	flipMode = GetConfigBool(config, "flipMode", false);
+	rectangularMode = GetConfigBool(config, "rectangularMode", false);
 }
 
 PuzzleSingleImageState::~PuzzleSingleImageState() {
@@ -104,7 +105,8 @@ void PuzzleSingleImageState::Draw(SDL_Renderer* target) {
 				Uint8 alpha = 255;
 				alpha = static_cast<Uint8>(255 * ((swapAnimationTime - swapAnimationDuration) / swapAnimationDuration));
 				SDL_SetTextureAlphaMod(this->pictureTex, alpha);
-			} else {
+			}
+			else {
 				SDL_SetTextureAlphaMod(this->pictureTex, 255);
 			}
 
@@ -146,6 +148,14 @@ void PuzzleSingleImageState::Draw(SDL_Renderer* target) {
 			SetConfigBool(config, "flipMode", flipMode);
 			SaveConfigMap(config);
 			Shuffle();
+		}
+		if (ImGui::MenuItem("Rectangular Mode", nullptr, rectangularMode)) {
+			rectangularMode = !rectangularMode;
+			// Save the updated configuration
+			std::map<std::string, std::string> config = LoadConfigMap();
+			SetConfigBool(config, "rectangularMode", rectangularMode);
+			SaveConfigMap(config);
+			// Note: Need to reload the image to apply the new piece generation mode
 		}
 		ImGui::EndMenu();
 	}
@@ -270,15 +280,24 @@ void PuzzleSingleImageState::LoadPictureFromFile(const std::string& filename, SD
 	SDL_FreeSurface(bitmapSurface);
 	SDL_SetTextureBlendMode(this->pictureTex, SDL_BLENDMODE_BLEND);
 	pieces_logical.clear();
-	SDL_Rect piece;
-	piece.x = 0;
-	piece.y = 0;
-	piece.h = resized_image_logical_height;
-	piece.w = resized_image_logical_width;
-	pieces_logical.push_back(piece);
-	for (int i = 0; i<10; ++i) {
-		SplitPiece();
+
+	if (rectangularMode) {
+		// Create a 4x4 grid of rectangular pieces
+		CreateRectangularPieces(4, 4);
 	}
+	else {
+		// Use the original splitting algorithm
+		SDL_Rect piece;
+		piece.x = 0;
+		piece.y = 0;
+		piece.h = resized_image_logical_height;
+		piece.w = resized_image_logical_width;
+		pieces_logical.push_back(piece);
+		for (int i = 0; i<10; ++i) {
+			SplitPiece();
+		}
+	}
+
 	ResizeImagePhysical();
 	Shuffle();
 }
@@ -329,6 +348,69 @@ void PuzzleSingleImageState::SplitPiece() {
 		if (piece.w > 2*min_piece_size || piece.h > 2*min_piece_size) {
 			SplitPiece(i);
 		}
+	}
+}
+
+void PuzzleSingleImageState::CreateRectangularPieces(int rows, int cols) {
+	pieces_logical.clear();
+	srand(time(NULL));
+
+	int num_pieces = rows * cols;
+	int attempts = 0;
+	const int max_attempts = num_pieces * 100;
+
+	// Try to place non-overlapping rectangles
+	while (pieces_logical.size() < num_pieces && attempts < max_attempts) {
+		attempts++;
+
+		// Random size within reasonable bounds
+		int piece_width = min_piece_size + rand() % (resized_image_logical_width / 3);
+		int piece_height = min_piece_size + rand() % (resized_image_logical_height / 3);
+
+		// Ensure pieces aren't too large
+		if (piece_width > resized_image_logical_width / 2) {
+			piece_width = resized_image_logical_width / 2;
+		}
+		if (piece_height > resized_image_logical_height / 2) {
+			piece_height = resized_image_logical_height / 2;
+		}
+
+		// Random position
+		int max_x = resized_image_logical_width - piece_width;
+		int max_y = resized_image_logical_height - piece_height;
+		if (max_x < 0) {
+			max_x = 0;
+		}
+		if (max_y < 0) {
+			max_y = 0;
+		}
+
+		int piece_x = rand() % (max_x + 1);
+		int piece_y = rand() % (max_y + 1);
+
+		SDL_Rect candidate;
+		candidate.x = piece_x;
+		candidate.y = piece_y;
+		candidate.w = piece_width;
+		candidate.h = piece_height;
+
+		// Check for overlaps with existing pieces
+		bool overlaps = false;
+		for (const SDL_Rect& existing : pieces_logical) {
+			if (SDL_HasIntersection(&candidate, &existing)) {
+				overlaps = true;
+				break;
+			}
+		}
+
+		if (!overlaps) {
+			pieces_logical.push_back(candidate);
+		}
+	}
+
+	// If we couldn't place enough pieces, fill remaining space with grid pieces
+	if (pieces_logical.size() < num_pieces) {
+		std::cerr << "Warning: Could only place " << pieces_logical.size() << " non-overlapping pieces out of " << num_pieces << " requested\n";
 	}
 }
 

@@ -45,6 +45,7 @@ public:
 	void SplitPiece(size_t piece_number);
 	void SplitPieceVertical(size_t piece_number);
 	void SplitPieceHorisontal(size_t piece_number);
+	void CreateRectangularPieces(int rows, int cols);
 	void Shuffle();
 	void CheckSolved();
 
@@ -53,6 +54,7 @@ public:
 	void CreatePhysicalPieces();
 
 	bool flipMode = false;
+	bool rectangularMode = false;
 private:
 	void ClearPicture();
 
