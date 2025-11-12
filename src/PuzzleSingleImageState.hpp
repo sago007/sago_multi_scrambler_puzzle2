@@ -62,6 +62,11 @@ private:
 	SDL_Texture* pictureTex = NULL;
 	int source_image_height = 1;
 	int source_image_width = 1;
+	// Swap animation
+	int swapAnimatingPiece1 = -1;
+	int swapAnimatingPiece2 = -1;
+	float swapAnimationTime = 0.0f;
+	const float swapAnimationDuration = 0.1f; // 100ms total
 	int resized_image_logical_height = 700;
 	int resized_image_logical_width = 1;
 	const int resized_image_logical_height_max = 700;

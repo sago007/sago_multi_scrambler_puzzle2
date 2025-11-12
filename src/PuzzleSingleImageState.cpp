@@ -98,8 +98,20 @@ void PuzzleSingleImageState::Draw(SDL_Renderer* target) {
 			if (rotated_pieces[i] == 2 || rotated_pieces[i] == 3) {
 				flip |= SDL_FLIP_VERTICAL;
 			}
+
+			// Apply fade animation if this piece is animating
+			if (i == swapAnimatingPiece1 || i == swapAnimatingPiece2) {
+				Uint8 alpha = 255;
+				alpha = static_cast<Uint8>(255 * ((swapAnimationTime - swapAnimationDuration) / swapAnimationDuration));
+				SDL_SetTextureAlphaMod(this->pictureTex, alpha);
+			} else {
+				SDL_SetTextureAlphaMod(this->pictureTex, 255);
+			}
+
 			SDL_RenderCopyEx(target, this->pictureTex, &source, &destination, 0, nullptr, static_cast<SDL_RendererFlip>(flip) );
 		}
+		// Reset alpha to full after drawing all pieces
+		SDL_SetTextureAlphaMod(this->pictureTex, 255);
 		for (size_t i = 0; i < pieces_physical.size(); ++i) {
 			const SDL_Rect& piece = pieces_physical[i];
 			if (i == marked_piece) {
@@ -150,6 +162,17 @@ void PuzzleSingleImageState::Update() {
 	lastTime = currentTime;
 	confetti.Update(deltaTime);
 
+	// Update swap animation
+	if (swapAnimatingPiece1 != -1 && swapAnimatingPiece2 != -1) {
+		swapAnimationTime += deltaTime;
+		if (swapAnimationTime >= swapAnimationDuration) {
+			// Animation complete, reset
+			swapAnimatingPiece1 = -1;
+			swapAnimatingPiece2 = -1;
+			swapAnimationTime = 0.0f;
+		}
+	}
+
 	// If the mouse button is released, make bMouseUp equal true
 	if ( !(SDL_GetMouseState(nullptr, nullptr)&SDL_BUTTON(1)) ) {
 		globalData.mouseUp=true;
@@ -172,6 +195,10 @@ void PuzzleSingleImageState::Update() {
 				}
 				else {
 					if (i != marked_piece && marked_piece > -1 && marked_piece < pieces_physical.size()) {
+						// Start swap animation
+						swapAnimatingPiece1 = i;
+						swapAnimatingPiece2 = marked_piece;
+						swapAnimationTime = 0.0f;
 						std::swap(shuffeled_pieces[i], shuffeled_pieces[marked_piece]);
 						marked_piece = -1;
 					}
@@ -241,6 +268,7 @@ void PuzzleSingleImageState::LoadPictureFromFile(const std::string& filename, SD
 	this->pictureTex = SDL_CreateTextureFromSurface(renderer, bitmapSurface);
 	std::cerr << resized_image_logical_width << ", " << resized_image_logical_height << ", id: " << picture_id << ", file: " << filename << "\n";
 	SDL_FreeSurface(bitmapSurface);
+	SDL_SetTextureBlendMode(this->pictureTex, SDL_BLENDMODE_BLEND);
 	pieces_logical.clear();
 	SDL_Rect piece;
 	piece.x = 0;
