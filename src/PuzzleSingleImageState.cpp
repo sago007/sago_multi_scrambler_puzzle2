@@ -82,6 +82,30 @@ void PuzzleSingleImageState::Draw(SDL_Renderer* target) {
 		SDL_RenderCopy(target, this->pictureTex, NULL, &rect);
 	}
 	else {
+		// In rectangular mode, draw the original image as background with cutouts
+		if (rectangularMode) {
+			// Draw a black background first
+			SDL_SetRenderDrawColor(target, 0, 0, 0, 255);
+			SDL_RenderFillRect(target, &rect);
+
+			// Draw the full background image slightly dimmed
+			SDL_SetTextureAlphaMod(this->pictureTex, 128);
+			SDL_RenderCopy(target, this->pictureTex, NULL, &rect);
+			SDL_SetTextureAlphaMod(this->pictureTex, 255);
+
+			// Draw black rectangles where the pieces should go (cutouts)
+			for (size_t i = 0; i < pieces_physical.size(); ++i) {
+				const SDL_Rect& piece = pieces_physical[i];
+				SDL_Rect cutout;
+				cutout.x = rect.x + piece.x;
+				cutout.y = rect.y + piece.y;
+				cutout.w = piece.w;
+				cutout.h = piece.h;
+				SDL_SetRenderDrawColor(target, 0, 0, 0, 255);
+				SDL_RenderFillRect(target, &cutout);
+			}
+		}
+
 		for (size_t i = 0; i < pieces_physical.size(); ++i) {
 			SDL_Rect destination = pieces_physical[i];
 			destination.x += rect.x;
