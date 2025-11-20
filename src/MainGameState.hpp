@@ -39,6 +39,8 @@ public:
 
 private:
 	bool isActive = true;
+	bool shouldLoadRandomFavorite = false;
+	void LoadRandomFavorite();
 };
 
 void DrawRectWhite(SDL_Renderer* target, int topx, int topy, int height, int width);

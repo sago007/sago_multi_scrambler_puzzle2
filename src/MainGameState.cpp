@@ -23,7 +23,13 @@ https://github.com/sago007/saland
 
 #include "MainGameState.hpp"
 #include <string>
+#include <random>
+#include <iostream>
 #include "globals.hpp"
+#include "SagoImGui.hpp"
+#include "config.hpp"
+#include "PuzzleSingleImageState.hpp"
+#include "sago_common.hpp"
 
 MainGameState::MainGameState() {
 }
@@ -33,20 +39,58 @@ MainGameState::~MainGameState() {
 }
 
 bool MainGameState::IsActive() {
-	return true;
+	return isActive;
 }
 
 void MainGameState::ProcessInput(const SDL_Event& event, bool& processed) {
-
+	ImGui_ImplSDL2_ProcessEvent(&event);
 }
 
 void MainGameState::Draw(SDL_Renderer* target) {
 	DrawRectYellow(target, 5, 5, 200, 200);
+
+	ImGui::BeginMainMenuBar();
+	if (ImGui::BeginMenu("File")) {
+		if (ImGui::MenuItem("Random image from favorites")) {
+			shouldLoadRandomFavorite = true;
+		}
+		if (ImGui::MenuItem("Quit")) {
+			isActive = false;
+		}
+		ImGui::EndMenu();
+	}
+	ImGui::EndMainMenuBar();
 }
 
 
 void MainGameState::Update() {
+	if (shouldLoadRandomFavorite) {
+		shouldLoadRandomFavorite = false;
+		LoadRandomFavorite();
+	}
+}
 
+void MainGameState::LoadRandomFavorite() {
+	std::vector<std::string> favorites = LoadFavorites();
+
+	if (favorites.empty()) {
+		std::cerr << "No favorites found!" << std::endl;
+		return;
+	}
+
+	// Pick a random favorite
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::uniform_int_distribution<> dis(0, favorites.size() - 1);
+	int randomIndex = dis(gen);
+
+	std::string randomFavorite = favorites[randomIndex];
+	std::cout << "Loading random favorite: " << randomFavorite << std::endl;
+
+	// Load the puzzle
+	PuzzleSingleImageState psi;
+	psi.LoadPictureFromFile(randomFavorite, globalData.screen);
+	RunGameState(psi);
 }
 
 
