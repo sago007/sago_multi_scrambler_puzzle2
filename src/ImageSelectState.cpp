@@ -28,6 +28,7 @@ https://github.com/sago007/saland
 #include "PuzzleSingleImageState.hpp"
 #include "sago_common.hpp"
 #include "SagoImGui.hpp"
+#include "config.hpp"
 
 static void DrawRect(SDL_Renderer* target, int topx, int topy, int height, int width, const std::string& name) {
 	const int size = 32;
@@ -144,12 +145,57 @@ void ImageSelectState::Draw(SDL_Renderer* target) {
 			imageNameFields[image_number].Draw(target, text_x_physical, text_y_physical,
 			                                   sago::SagoTextField::Alignment::center, sago::SagoTextField::VerticalAlignment::bottom);
 		}
+
+		// Draw favorite indicator as ImGui button overlay
+		if (image_number < imageList.size()) {
+			bool isFavorite = IsFavorite(imageList[image_number]);
+			int star_x_physical, star_y_physical;
+			logicalResize.LogicalToPhysical(
+			    frame_logical.x + frame_size - 40,
+			    frame_logical.y + 10,
+			    star_x_physical, star_y_physical);
+
+			ImGui::SetNextWindowPos(ImVec2(star_x_physical, star_y_physical));
+			ImGui::SetNextWindowSize(ImVec2(0, 0));
+			ImGui::Begin(("##favorite" + std::to_string(image_number)).c_str(),
+			            nullptr,
+			            ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
+			            ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar |
+			            ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_AlwaysAutoResize |
+			            ImGuiWindowFlags_NoBackground);
+
+			const char* starText = isFavorite ? "★" : "☆";
+			if (ImGui::Button(starText)) {
+				if (isFavorite) {
+					RemoveFavorite(imageList[image_number]);
+				} else {
+					AddFavorite(imageList[image_number]);
+				}
+			}
+			if (ImGui::IsItemHovered()) {
+				ImGui::SetTooltip(isFavorite ? "Remove from favorites" : "Add to favorites");
+			}
+
+			ImGui::End();
+		}
 	}
 
 	ImGui::BeginMainMenuBar();
 	if (ImGui::BeginMenu("File")) {
 		if (ImGui::MenuItem("Close")) {
 			isActive = false;
+		}
+		ImGui::EndMenu();
+	}
+	if (ImGui::BeginMenu("View")) {
+		if (ImGui::MenuItem("Show Only Favorites", nullptr, showOnlyFavorites)) {
+			showOnlyFavorites = !showOnlyFavorites;
+			// Reload the image list with the new filter
+			imageList.clear();
+			imageNameFields.clear();
+			imageHolders.clear();
+			firstImage = 0;
+			Init();
 		}
 		ImGui::EndMenu();
 	}
@@ -178,6 +224,11 @@ void ImageSelectState::Update() {
 
 	if (SDL_GetMouseState(nullptr,nullptr)&SDL_BUTTON(1) && globalData.mouseUp) {
 		globalData.mouseUp = false;
+
+		// Don't process clicks if ImGui wants to capture the mouse (e.g., clicking on buttons)
+		if (ImGui::GetIO().WantCaptureMouse) {
+			return;
+		}
 
 		// Convert physical mouse coordinates to logical coordinates
 		int mouse_x_logical, mouse_y_logical;
@@ -263,13 +314,20 @@ void ImageSelectState::Init() {
 	if (!folder.empty()) {
 		for (const auto& entry : std::filesystem::directory_iterator(folder)) {
 			if (entry.is_regular_file() && (HasExtension(entry.path().string(), ".jpg") || HasExtension(entry.path().string(), ".jpeg") || HasExtension(entry.path().string(), ".png") ) ) {
+				std::string imagePath = entry.path().string();
+
+				// If showOnlyFavorites is enabled, skip non-favorite images
+				if (showOnlyFavorites && !IsFavorite(imagePath)) {
+					continue;
+				}
+
 				std::cout << entry.path() << std::endl;
-				imageList.push_back(entry.path().string());
+				imageList.push_back(imagePath);
 				sago::SagoTextField field;
 				setFontText(globalData.dataHolder, field, entry.path().filename().string().c_str());
 				imageNameFields.push_back(std::move(field));
 				imageHolders.emplace_back();
-				imageHolders.back().LoadPictureFromFileLazy(entry.path().string());
+				imageHolders.back().LoadPictureFromFileLazy(imagePath);
 			}
 		}
 	}

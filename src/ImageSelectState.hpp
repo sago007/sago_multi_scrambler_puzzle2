@@ -53,6 +53,7 @@ public:
 
 private:
 	bool isActive = true;
+	bool showOnlyFavorites = false;
 	sago::SagoLogicalResize logicalResize;
 };
 

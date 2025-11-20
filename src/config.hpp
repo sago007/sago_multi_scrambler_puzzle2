@@ -27,6 +27,7 @@ SOFTWARE.
 
 #include <string>
 #include <map>
+#include <vector>
 
 /**
  * @brief Loads configuration from file into a map
@@ -90,5 +91,36 @@ std::string GetConfigString(const std::map<std::string, std::string>& config, co
  * @param value The string value
  */
 void SetConfigString(std::map<std::string, std::string>& config, const std::string& key, const std::string& value);
+
+/**
+ * @brief Loads the list of favorite image paths
+ * @return Vector of absolute paths to favorite images
+ */
+std::vector<std::string> LoadFavorites();
+
+/**
+ * @brief Saves the list of favorite image paths
+ * @param favorites Vector of absolute paths to favorite images
+ */
+void SaveFavorites(const std::vector<std::string>& favorites);
+
+/**
+ * @brief Adds an image path to favorites
+ * @param imagePath Absolute path to the image
+ */
+void AddFavorite(const std::string& imagePath);
+
+/**
+ * @brief Removes an image path from favorites
+ * @param imagePath Absolute path to the image
+ */
+void RemoveFavorite(const std::string& imagePath);
+
+/**
+ * @brief Checks if an image path is in favorites
+ * @param imagePath Absolute path to the image
+ * @return true if the image is a favorite, false otherwise
+ */
+bool IsFavorite(const std::string& imagePath);
 
 #endif // CONFIG_HPP

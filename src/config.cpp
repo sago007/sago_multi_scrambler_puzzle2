@@ -25,6 +25,7 @@ SOFTWARE.
 #include "config.hpp"
 #include "os.hpp"
 #include <fstream>
+#include <vector>
 
 std::map<std::string, std::string> LoadConfigMap() {
 	std::map<std::string, std::string> config;
@@ -106,4 +107,74 @@ std::string GetConfigString(const std::map<std::string, std::string>& config, co
 
 void SetConfigString(std::map<std::string, std::string>& config, const std::string& key, const std::string& value) {
 	config[key] = value;
+}
+
+std::vector<std::string> LoadFavorites() {
+	std::vector<std::string> favorites;
+	std::string favoritesPath = getPathToSaveFiles() + "/favorites.txt";
+	std::ifstream favoritesFile(favoritesPath);
+
+	if (favoritesFile.is_open()) {
+		std::string line;
+		while (std::getline(favoritesFile, line)) {
+			if (!line.empty() && line[0] != '#') {
+				favorites.push_back(line);
+			}
+		}
+		favoritesFile.close();
+	}
+
+	return favorites;
+}
+
+void SaveFavorites(const std::vector<std::string>& favorites) {
+	std::string favoritesPath = getPathToSaveFiles() + "/favorites.txt";
+	std::ofstream favoritesFile(favoritesPath);
+
+	if (favoritesFile.is_open()) {
+		favoritesFile << "# Favorite images - one absolute path per line" << std::endl;
+		for (const auto& favorite : favorites) {
+			favoritesFile << favorite << std::endl;
+		}
+		favoritesFile.close();
+	}
+}
+
+void AddFavorite(const std::string& imagePath) {
+	std::vector<std::string> favorites = LoadFavorites();
+
+	// Check if already in favorites
+	for (const auto& fav : favorites) {
+		if (fav == imagePath) {
+			return;
+		}
+	}
+
+	favorites.push_back(imagePath);
+	SaveFavorites(favorites);
+}
+
+void RemoveFavorite(const std::string& imagePath) {
+	std::vector<std::string> favorites = LoadFavorites();
+	std::vector<std::string> newFavorites;
+
+	for (const auto& fav : favorites) {
+		if (fav != imagePath) {
+			newFavorites.push_back(fav);
+		}
+	}
+
+	SaveFavorites(newFavorites);
+}
+
+bool IsFavorite(const std::string& imagePath) {
+	std::vector<std::string> favorites = LoadFavorites();
+
+	for (const auto& fav : favorites) {
+		if (fav == imagePath) {
+			return true;
+		}
+	}
+
+	return false;
 }
