@@ -60,6 +60,16 @@ void MainGameState::Draw(SDL_Renderer* target) {
 		ImGui::EndMenu();
 	}
 	ImGui::EndMainMenuBar();
+
+	// Center a window with the button
+	ImGui::SetNextWindowPos(ImVec2(globalData.xsize / 2.0f, globalData.ysize / 2.0f), ImGuiCond_Always, ImVec2(0.5f, 0.5f));
+	ImGui::Begin("Main Menu", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove);
+
+	if (ImGui::Button("Random image from favorites", ImVec2(300, 50))) {
+		shouldLoadRandomFavorite = true;
+	}
+
+	ImGui::End();
 }
 
 
