@@ -69,6 +69,10 @@ void MainGameState::Draw(SDL_Renderer* target) {
 		shouldLoadRandomFavorite = true;
 	}
 
+	if (ImGui::Button("Quit", ImVec2(300, 50))) {
+		isActive = false;
+	}
+
 	ImGui::End();
 }
 
