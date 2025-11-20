@@ -148,7 +148,8 @@ void ImageSelectState::Draw(SDL_Renderer* target) {
 
 		// Draw favorite indicator as ImGui button overlay
 		if (image_number < imageList.size()) {
-			bool isFavorite = IsFavorite(imageList[image_number]);
+			std::string absolutePath = std::filesystem::absolute(imageList[image_number]).string();
+			bool isFavorite = IsFavorite(absolutePath);
 			int star_x_physical, star_y_physical;
 			logicalResize.LogicalToPhysical(
 			    frame_logical.x + frame_size - 40,
@@ -167,9 +168,9 @@ void ImageSelectState::Draw(SDL_Renderer* target) {
 			const char* starText = isFavorite ? "★" : "☆";
 			if (ImGui::Button(starText)) {
 				if (isFavorite) {
-					RemoveFavorite(imageList[image_number]);
+					RemoveFavorite(absolutePath);
 				} else {
-					AddFavorite(imageList[image_number]);
+					AddFavorite(absolutePath);
 				}
 			}
 			if (ImGui::IsItemHovered()) {
@@ -315,9 +316,10 @@ void ImageSelectState::Init() {
 		for (const auto& entry : std::filesystem::directory_iterator(folder)) {
 			if (entry.is_regular_file() && (HasExtension(entry.path().string(), ".jpg") || HasExtension(entry.path().string(), ".jpeg") || HasExtension(entry.path().string(), ".png") ) ) {
 				std::string imagePath = entry.path().string();
+				std::string absolutePath = std::filesystem::absolute(imagePath).string();
 
 				// If showOnlyFavorites is enabled, skip non-favorite images
-				if (showOnlyFavorites && !IsFavorite(imagePath)) {
+				if (showOnlyFavorites && !IsFavorite(absolutePath)) {
 					continue;
 				}
 
