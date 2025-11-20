@@ -62,6 +62,7 @@ private:
 	bool puzzleSolved = false;
 	Confetti confetti;
 	SDL_Texture* pictureTex = NULL;
+	std::string imageFilePath = "";
 	int source_image_height = 1;
 	int source_image_width = 1;
 	// Swap animation

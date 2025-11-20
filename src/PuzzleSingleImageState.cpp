@@ -27,6 +27,7 @@ https://github.com/sago007/saland
 #include "globals.hpp"
 #include <SDL2/SDL2_gfxPrimitives.h>
 #include <time.h>
+#include <filesystem>
 #include "SagoImGui.hpp"
 #include "rhash.hpp"
 #include "config.hpp"
@@ -162,6 +163,17 @@ void PuzzleSingleImageState::Draw(SDL_Renderer* target) {
 		if (ImGui::MenuItem("Shuffle")) {
 			Shuffle();
 		}
+		if (imageFilePath.length()) {
+			bool isFav = IsFavorite(imageFilePath);
+			const char* favoriteText = isFav ? "Remove from Favorites" : "Add to Favorites";
+			if (ImGui::MenuItem(favoriteText)) {
+				if (isFav) {
+					RemoveFavorite(imageFilePath);
+				} else {
+					AddFavorite(imageFilePath);
+				}
+			}
+		}
 		ImGui::EndMenu();
 	}
 	if (ImGui::BeginMenu("Settings")) {
@@ -287,6 +299,7 @@ void PuzzleSingleImageState::ResizeImagePhysical() {
 
 void PuzzleSingleImageState::LoadPictureFromFile(const std::string& filename, SDL_Renderer* renderer) {
 	ClearPicture();
+	imageFilePath = std::filesystem::absolute(filename).string();
 	IMG_Init(IMG_INIT_JPG|IMG_INIT_PNG);
 	SDL_Surface* bitmapSurface = IMG_Load(filename.c_str());
 	if (!bitmapSurface) {
