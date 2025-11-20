@@ -1,0 +1,24 @@
+{
+"_comment": "Level icons - checkbox and check mark",
+
+"i_level_check_box" : {
+	"texture" : "i_level_check_box",
+	"topx" : 0,
+	"topy" : 0,
+	"height" : 30,
+	"width" : 30,
+	"number_of_frames" : 1,
+	"frame_time" : 1
+},
+
+"i_level_check" : {
+	"texture" : "i_level_check",
+	"topx" : 0,
+	"topy" : 0,
+	"height" : 30,
+	"width" : 30,
+	"number_of_frames" : 1,
+	"frame_time" : 1
+}
+
+}

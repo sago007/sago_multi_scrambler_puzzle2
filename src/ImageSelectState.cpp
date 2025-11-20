@@ -146,18 +146,30 @@ void ImageSelectState::Draw(SDL_Renderer* target) {
 			                                   sago::SagoTextField::Alignment::center, sago::SagoTextField::VerticalAlignment::bottom);
 		}
 
-		// Draw favorite indicator as ImGui button overlay
+		// Draw favorite indicator with sprites
 		if (image_number < imageList.size()) {
 			std::string absolutePath = std::filesystem::absolute(imageList[image_number]).string();
 			bool isFavorite = IsFavorite(absolutePath);
-			int star_x_physical, star_y_physical;
+			int icon_x_physical, icon_y_physical;
 			logicalResize.LogicalToPhysical(
 			    frame_logical.x + frame_size - 40,
 			    frame_logical.y + 10,
-			    star_x_physical, star_y_physical);
+			    icon_x_physical, icon_y_physical);
 
-			ImGui::SetNextWindowPos(ImVec2(star_x_physical, star_y_physical));
+			// Draw the checkbox sprite
+			const sago::SagoSprite& checkbox = globalData.spriteHolder->GetSprite("i_level_check_box");
+			checkbox.Draw(target, SDL_GetTicks(), icon_x_physical, icon_y_physical);
+
+			// If favorite, draw the check mark on top
+			if (isFavorite) {
+				const sago::SagoSprite& check = globalData.spriteHolder->GetSprite("i_level_check");
+				check.Draw(target, SDL_GetTicks(), icon_x_physical, icon_y_physical);
+			}
+
+			// Create an invisible ImGui button overlay for clicking
+			ImGui::SetNextWindowPos(ImVec2(icon_x_physical, icon_y_physical));
 			ImGui::SetNextWindowSize(ImVec2(0, 0));
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
 			ImGui::Begin(("##favorite" + std::to_string(image_number)).c_str(),
 			            nullptr,
 			            ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
@@ -165,19 +177,27 @@ void ImageSelectState::Draw(SDL_Renderer* target) {
 			            ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_AlwaysAutoResize |
 			            ImGuiWindowFlags_NoBackground);
 
-			const char* starText = isFavorite ? "★" : "☆";
-			if (ImGui::Button(starText)) {
+			// Invisible button with the size of the icon
+			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+			ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.2f, 0.2f, 0.2f, 0.3f));
+			ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.3f, 0.3f, 0.3f, 0.5f));
+			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
+			if (ImGui::Button("##toggle", ImVec2(30, 30))) {
 				if (isFavorite) {
 					RemoveFavorite(absolutePath);
 				} else {
 					AddFavorite(absolutePath);
 				}
 			}
+			ImGui::PopStyleVar();
+			ImGui::PopStyleColor(3);
+
 			if (ImGui::IsItemHovered()) {
 				ImGui::SetTooltip(isFavorite ? "Remove from favorites" : "Add to favorites");
 			}
 
 			ImGui::End();
+			ImGui::PopStyleVar();
 		}
 	}
 
