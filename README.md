@@ -31,6 +31,18 @@ Currently an image must be given on the command line like so:
 
 #### Linux (GNOME/Nautilus, KDE/Dolphin, etc.)
 
+**Quick Install (Recommended):**
+
+Simply run the program with the `--install-desktop-entry` flag:
+
+```bash
+./sago_multi_scrambler_puzzle2 --install-desktop-entry
+```
+
+This will automatically create the desktop entry file and update the desktop database.
+
+**Manual Installation:**
+
 1. **Create a desktop entry file:**
    
    Create the file `~/.local/share/applications/sago-multi-scrambler-puzzle2.desktop`:

@@ -22,6 +22,7 @@ https://github.com/sago007/saland
 */
 
 #include <iostream>
+#include <fstream>
 #include <boost/program_options.hpp>
 #include "sago/SagoDataHolder.hpp"
 #include "sago/SagoSpriteHolder.hpp"
@@ -34,6 +35,8 @@ https://github.com/sago007/saland
 #include "MainGameState.hpp"
 #include "editor/SagoTextureSelector.hpp"
 #include "version.h"
+#include "os.hpp"
+#include "sago/platform_folders.h"
 #include <filesystem>
 
 
@@ -80,6 +83,71 @@ void runEditor() {
 	UninitGame();
 }
 
+bool installDesktopEntry() {
+#if defined(__unix__) && !defined(__APPLE__)
+	// Get the executable path
+	std::string exe_path;
+	try {
+		exe_path = std::filesystem::canonical("/proc/self/exe").string();
+	} catch (const std::exception& e) {
+		std::cerr << "Error: Could not determine executable path: " << e.what() << "\n";
+		return false;
+	}
+
+	std::string desktop_dir = sago::getDataHome() + "/applications";
+	OsCreateFolder(desktop_dir);
+
+	std::string desktop_file_path = desktop_dir + "/sago-multi-scrambler-puzzle2.desktop";
+
+	// Check if file already exists
+	if (std::filesystem::exists(desktop_file_path)) {
+		std::cout << "Desktop entry already exists at: " << desktop_file_path << "\n";
+		std::cout << "Skipping installation.\n";
+		return true;
+	}
+
+	// Create the desktop entry file
+	std::ofstream desktop_file(desktop_file_path);
+	if (!desktop_file) {
+		std::cerr << "Error: Could not create desktop entry file at: " << desktop_file_path << "\n";
+		return false;
+	}
+
+	desktop_file << "[Desktop Entry]\n";
+	desktop_file << "Version=1.0\n";
+	desktop_file << "Type=Application\n";
+	desktop_file << "Name=Sago Multi Scrambler Puzzle II\n";
+	desktop_file << "Comment=Image scrambling puzzle game\n";
+	desktop_file << "Exec=" << exe_path << " %f\n";
+	desktop_file << "Terminal=false\n";
+	desktop_file << "Categories=Game;LogicGame;\n";
+	desktop_file << "MimeType=image/jpeg;image/png;image/jpg;\n";
+
+	desktop_file.close();
+
+	std::cout << "Desktop entry created successfully at: " << desktop_file_path << "\n";
+
+	// Update the desktop database
+	std::string update_cmd = "update-desktop-database \"" + desktop_dir + "\" 2>/dev/null";
+	int result = system(update_cmd.c_str());
+	if (result == 0) {
+		std::cout << "Desktop database updated successfully.\n";
+	} else {
+		std::cout << "Note: Failed to update desktop database. You may need to run:\n";
+		std::cout << "  update-desktop-database \"" << desktop_dir << "\"\n";
+	}
+
+	std::cout << "\nYou can now right-click on image files and select\n";
+	std::cout << "'Open With → Sago Multi Scrambler Puzzle II' from the context menu.\n";
+
+	return true;
+#else
+	std::cerr << "Error: Desktop entry installation is only supported on Linux.\n";
+	std::cerr << "For Windows, please see the README.md for registry-based installation.\n";
+	return false;
+#endif
+}
+
 
 int main(int argc, const char* argv[]) {
 	boost::program_options::options_description desc("Options");
@@ -92,6 +160,7 @@ int main(int argc, const char* argv[]) {
 	("collection", boost::program_options::value< std::string >(), "Jump straigt to a named collection. Like \"fairy_tales\"")
 	("folder", boost::program_options::value< std::string >(), "Open a specific folder.")
 	("editor", "Opens a build in editor. Not implemented yet.")
+	("install-desktop-entry", "Install desktop entry file for Linux desktop integration (adds 'Open With' menu option)")
 	;
 	boost::program_options::variables_map vm;
 	boost::program_options::store(boost::program_options::command_line_parser(argc, argv).options(desc).positional(p).run(), vm);
@@ -103,6 +172,9 @@ int main(int argc, const char* argv[]) {
 	if (vm.count("version")) {
 		std::cout << GAMENAME << " " << VERSION_NUMBER << "\n";
 		return 0;
+	}
+	if (vm.count("install-desktop-entry")) {
+		return installDesktopEntry() ? 0 : 1;
 	}
 
 	InitSagoFS(argc, argv);
