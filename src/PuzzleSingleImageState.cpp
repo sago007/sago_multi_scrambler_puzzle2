@@ -22,6 +22,7 @@ https://github.com/sago007/saland
 */
 
 #include "PuzzleSingleImageState.hpp"
+#include "PuzzlePieceEditorState.hpp"
 #include "SDL_image.h"
 #include <iostream>
 #include "globals.hpp"
@@ -31,6 +32,7 @@ https://github.com/sago007/saland
 #include "SagoImGui.hpp"
 #include "rhash.hpp"
 #include "config.hpp"
+#include "sago_common.hpp"
 
 PuzzleSingleImageState::PuzzleSingleImageState() {
 	std::map<std::string, std::string> config = LoadConfigMap();
@@ -163,6 +165,9 @@ void PuzzleSingleImageState::Draw(SDL_Renderer* target) {
 		if (ImGui::MenuItem("Shuffle")) {
 			Shuffle();
 		}
+		if (rectangularMode && ImGui::MenuItem("Edit Piece Layout")) {
+			shouldLaunchEditor = true;
+		}
 		if (imageFilePath.length()) {
 			bool isFav = IsFavorite(imageFilePath);
 			const char* favoriteText = isFav ? "Remove from Favorites" : "Add to Favorites";
@@ -202,6 +207,13 @@ void PuzzleSingleImageState::Draw(SDL_Renderer* target) {
 
 
 void PuzzleSingleImageState::Update() {
+	// Launch editor if requested (must be done outside of Draw/ImGui frame)
+	if (shouldLaunchEditor) {
+		shouldLaunchEditor = false;
+		LaunchPieceEditor();
+		return;
+	}
+
 	static Uint32 lastTime = SDL_GetTicks();
 	Uint32 currentTime = SDL_GetTicks();
 	float deltaTime = (currentTime - lastTime) / 1000.0f;
@@ -319,8 +331,14 @@ void PuzzleSingleImageState::LoadPictureFromFile(const std::string& filename, SD
 	pieces_logical.clear();
 
 	if (rectangularMode) {
-		// Create a 4x4 grid of rectangular pieces
-		CreateRectangularPieces(4, 4);
+		// Try to load custom piece layout first
+		if (!LoadCustomPieceLayout(picture_id, pieces_logical)) {
+			// Create a 4x4 grid of rectangular pieces if no custom layout exists
+			CreateRectangularPieces(4, 4);
+		}
+		else {
+			std::cerr << "Loaded custom piece layout with " << pieces_logical.size() << " pieces\n";
+		}
 	}
 	else {
 		// Use the original splitting algorithm
@@ -503,5 +521,28 @@ void PuzzleSingleImageState::CheckSolved() {
 	if (!wasSolved && !puzzleSolved) {
 		puzzleSolved = true;
 		confetti.Burst(globalData.xsize, globalData.ysize);
+	}
+}
+
+void PuzzleSingleImageState::LaunchPieceEditor() {
+	if (!rectangularMode || !pictureTex) {
+		return;
+	}
+
+	// Create and run the editor state
+	PuzzlePieceEditorState editor(imageFilePath, picture_id, pictureTex,
+	                              source_image_width, source_image_height,
+	                              pieces_logical);
+	RunGameState(editor);
+
+	// If the editor saved changes, reload the pieces
+	if (editor.WasSaved()) {
+		std::vector<SDL_Rect> newPieces = editor.GetEditedPieces();
+		if (!newPieces.empty()) {
+			pieces_logical = newPieces;
+			CreatePhysicalPieces();
+			Shuffle();
+			std::cout << "Applied edited piece layout\n";
+		}
 	}
 }

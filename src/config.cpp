@@ -178,3 +178,47 @@ bool IsFavorite(const std::string& imagePath) {
 
 	return false;
 }
+
+bool LoadCustomPieceLayout(const std::string& pictureId, std::vector<SDL_Rect>& pieces) {
+	std::string layoutPath = getPathToSaveFiles() + "/piece_layouts/" + pictureId + ".layout";
+	std::ifstream file(layoutPath);
+	if (!file.is_open()) {
+		return false;
+	}
+	pieces.clear();
+	int numPieces;
+	file >> numPieces;
+	for (int i = 0; i < numPieces; ++i) {
+		SDL_Rect piece;
+		file >> piece.x >> piece.y >> piece.w >> piece.h;
+		pieces.push_back(piece);
+	}
+	file.close();
+	return !pieces.empty();
+}
+
+bool SaveCustomPieceLayout(const std::string& pictureId, const std::vector<SDL_Rect>& pieces) {
+	std::string savePath = getPathToSaveFiles() + "/piece_layouts";
+	OsCreateFolder(savePath);
+
+	std::string layoutPath = savePath + "/" + pictureId + ".layout";
+	std::ofstream file(layoutPath);
+
+	if (!file.is_open()) {
+		return false;
+	}
+
+	file << pieces.size() << std::endl;
+	for (const SDL_Rect& piece : pieces) {
+		file << piece.x << " " << piece.y << " " << piece.w << " " << piece.h << std::endl;
+	}
+
+	file.close();
+	return true;
+}
+
+bool HasCustomPieceLayout(const std::string& pictureId) {
+	std::string layoutPath = getPathToSaveFiles() + "/piece_layouts/" + pictureId + ".layout";
+	std::ifstream file(layoutPath);
+	return file.is_open();
+}

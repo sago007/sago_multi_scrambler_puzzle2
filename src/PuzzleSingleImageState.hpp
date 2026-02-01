@@ -52,10 +52,12 @@ public:
 	void ResizeImage();
 	void ResizeImagePhysical();
 	void CreatePhysicalPieces();
+	void LaunchPieceEditor();
 
 	bool flipMode = false;
 	bool rectangularMode = false;
 private:
+	bool shouldLaunchEditor = false;
 	void ClearPicture();
 
 	bool isActive = true;

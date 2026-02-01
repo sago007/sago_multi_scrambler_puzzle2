@@ -28,6 +28,7 @@ SOFTWARE.
 #include <string>
 #include <map>
 #include <vector>
+#include "SDL.h"
 
 /**
  * @brief Loads configuration from file into a map
@@ -122,5 +123,28 @@ void RemoveFavorite(const std::string& imagePath);
  * @return true if the image is a favorite, false otherwise
  */
 bool IsFavorite(const std::string& imagePath);
+
+/**
+ * @brief Loads custom piece layout for an image
+ * @param pictureId Unique identifier for the image (hash)
+ * @param pieces Vector to fill with piece rectangles
+ * @return true if custom layout was loaded, false otherwise
+ */
+bool LoadCustomPieceLayout(const std::string& pictureId, std::vector<SDL_Rect>& pieces);
+
+/**
+ * @brief Saves custom piece layout for an image
+ * @param pictureId Unique identifier for the image (hash)
+ * @param pieces Vector of piece rectangles to save
+ * @return true if layout was saved successfully, false otherwise
+ */
+bool SaveCustomPieceLayout(const std::string& pictureId, const std::vector<SDL_Rect>& pieces);
+
+/**
+ * @brief Checks if a custom piece layout exists for an image
+ * @param pictureId Unique identifier for the image (hash)
+ * @return true if custom layout exists, false otherwise
+ */
+bool HasCustomPieceLayout(const std::string& pictureId);
 
 #endif // CONFIG_HPP

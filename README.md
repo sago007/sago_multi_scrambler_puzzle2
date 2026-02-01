@@ -25,6 +25,31 @@ Currently an image must be given on the command line like so:
 ./sago_multi_scrambler_puzzle2 data/collections/fairy_tales/The\ Three\ Bears\ \(1918\).jpg
 ```
 
+## Features
+
+### Rectangular Mode
+
+In the Settings menu, you can enable "Rectangular Mode" which creates puzzles with rectangular pieces instead of the default random splitting algorithm.
+
+### Custom Piece Layout Editor
+
+When in Rectangular Mode, you can customize the placement and size of puzzle pieces:
+
+1. Open an image in Rectangular Mode
+2. Select **File → Edit Piece Layout** to launch the piece editor
+3. In the editor, you can:
+   - **Click** on a piece to select it
+   - **Drag** a selected piece to move it
+   - **Drag corners** to resize from that corner
+   - **Drag edges** to resize from that edge
+   - Press **N** to add a new piece
+   - Press **Delete** to remove the selected piece
+   - Press **Ctrl+S** to save the custom layout
+4. Press **ESC** or close via menu to exit the editor
+5. Your custom piece layout will be saved and used automatically the next time you load that image
+
+Custom layouts are saved per-image based on the image's unique hash, so each image can have its own custom puzzle layout.
+
 ## Desktop Integration
 
 ### Adding "Open with Sago Multi Scrambler Puzzle II" to Context Menu
