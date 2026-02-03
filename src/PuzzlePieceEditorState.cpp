@@ -26,9 +26,9 @@ https://github.com/sago007/sago_multi_scrambler_puzzle2
 #include "SagoImGui.hpp"
 #include "config.hpp"
 #include "os.hpp"
+#include "sago/SagoMisc.hpp"
 #include <SDL2/SDL2_gfxPrimitives.h>
 #include <iostream>
-#include <fstream>
 #include <sstream>
 
 PuzzlePieceEditorState::PuzzlePieceEditorState() {
@@ -257,21 +257,15 @@ void PuzzlePieceEditorState::UpdateDrag() {
 }
 
 void PuzzlePieceEditorState::SavePieces() {
-	std::string savePath = getPathToSaveFiles() + "/piece_layouts";
-	OsCreateFolder(savePath);
-	std::string filename = savePath + "/" + pictureId + ".layout";
-	std::ofstream file(filename);
-	if (file.is_open()) {
-		file << pieces_logical.size() << std::endl;
-		for (const SDL_Rect& piece : pieces_logical) {
-			file << piece.x << " " << piece.y << " " << piece.w << " " << piece.h << std::endl;
-		}
-		file.close();
-		saved = true;
-		std::cout << "Saved piece layout to " << filename << std::endl;
-	} else {
-		std::cerr << "Failed to save piece layout to " << filename << std::endl;
+	std::string layoutPath = "piece_layouts/" + pictureId + ".layout";
+	std::ostringstream oss;
+	oss << pieces_logical.size() << "\n";
+	for (const SDL_Rect& piece : pieces_logical) {
+		oss << piece.x << " " << piece.y << " " << piece.w << " " << piece.h << "\n";
 	}
+	sago::WriteFileContent(layoutPath.c_str(), oss.str());
+	saved = true;
+	std::cout << "Saved piece layout to " << layoutPath << std::endl;
 }
 
 void PuzzlePieceEditorState::DeleteSelectedPiece() {

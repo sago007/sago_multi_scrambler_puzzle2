@@ -30,11 +30,14 @@ https://github.com/sago007/saland
 #include "SagoImGui.hpp"
 #include "sago/platform_folders.h"
 #include "os.hpp"
+#include <iostream>
 
 void InitSagoFS(int argc, const char* argv[]) {
 	PHYSFS_init(argv[0]);
 	PHYSFS_mount((std::string(PHYSFS_getBaseDir())+"/data").c_str(), nullptr, 0);
+	PHYSFS_mount(getPathToSaveFiles().c_str(), nullptr, 0);
 	OsCreateSaveFolder();
+	PHYSFS_setWriteDir(getPathToSaveFiles().c_str());
 }
 
 void RunGameState(sago::GameStateInterface& state ) {

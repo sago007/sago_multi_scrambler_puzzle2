@@ -24,17 +24,20 @@ SOFTWARE.
 
 #include "config.hpp"
 #include "os.hpp"
-#include <fstream>
+#include "sago/SagoMisc.hpp"
 #include <vector>
+#include <sstream>
 
 std::map<std::string, std::string> LoadConfigMap() {
 	std::map<std::string, std::string> config;
-	std::string configPath = getPathToSaveFiles() + "/config.txt";
-	std::ifstream configFile(configPath);
+	std::string configPath = "config.txt";
 
-	if (configFile.is_open()) {
+	if (sago::FileExists(configPath.c_str())) {
+		std::string content = sago::GetFileContent(configPath);
+		std::istringstream iss(content);
 		std::string line;
-		while (std::getline(configFile, line)) {
+
+		while (std::getline(iss, line)) {
 			// Skip empty lines and comments
 			if (line.empty() || line[0] == '#') {
 				continue;
@@ -48,23 +51,21 @@ std::map<std::string, std::string> LoadConfigMap() {
 				config[key] = value;
 			}
 		}
-		configFile.close();
 	}
 
 	return config;
 }
 
 void SaveConfigMap(const std::map<std::string, std::string>& config) {
-	std::string configPath = getPathToSaveFiles() + "/config.txt";
-	std::ofstream configFile(configPath);
+	std::string configPath = "config.txt";
+	std::ostringstream oss;
 
-	if (configFile.is_open()) {
-		configFile << "# Sago Multi Scrambler Puzzle II Configuration" << std::endl;
-		for (const auto& pair : config) {
-			configFile << pair.first << "=" << pair.second << std::endl;
-		}
-		configFile.close();
+	oss << "# Sago Multi Scrambler Puzzle II Configuration\n";
+	for (const auto& pair : config) {
+		oss << pair.first << "=" << pair.second << "\n";
 	}
+
+	sago::WriteFileContent(configPath.c_str(), oss.str());
 }
 
 bool GetConfigBool(const std::map<std::string, std::string>& config, const std::string& key, bool defaultValue) {
@@ -111,33 +112,31 @@ void SetConfigString(std::map<std::string, std::string>& config, const std::stri
 
 std::vector<std::string> LoadFavorites() {
 	std::vector<std::string> favorites;
-	std::string favoritesPath = getPathToSaveFiles() + "/favorites.txt";
-	std::ifstream favoritesFile(favoritesPath);
-
-	if (favoritesFile.is_open()) {
+	std::string favoritesPath = "favorites.txt";
+	if (sago::FileExists(favoritesPath.c_str())) {
+		std::string content = sago::GetFileContent(favoritesPath);
+		std::istringstream iss(content);
 		std::string line;
-		while (std::getline(favoritesFile, line)) {
+		while (std::getline(iss, line)) {
 			if (!line.empty() && line[0] != '#') {
 				favorites.push_back(line);
 			}
 		}
-		favoritesFile.close();
 	}
 
 	return favorites;
 }
 
 void SaveFavorites(const std::vector<std::string>& favorites) {
-	std::string favoritesPath = getPathToSaveFiles() + "/favorites.txt";
-	std::ofstream favoritesFile(favoritesPath);
+	std::string favoritesPath = "favorites.txt";
+	std::ostringstream oss;
 
-	if (favoritesFile.is_open()) {
-		favoritesFile << "# Favorite images - one absolute path per line" << std::endl;
-		for (const auto& favorite : favorites) {
-			favoritesFile << favorite << std::endl;
-		}
-		favoritesFile.close();
+	oss << "# Favorite images - one absolute path per line\n";
+	for (const auto& favorite : favorites) {
+		oss << favorite << "\n";
 	}
+
+	sago::WriteFileContent(favoritesPath.c_str(), oss.str());
 }
 
 void AddFavorite(const std::string& imagePath) {
@@ -180,45 +179,41 @@ bool IsFavorite(const std::string& imagePath) {
 }
 
 bool LoadCustomPieceLayout(const std::string& pictureId, std::vector<SDL_Rect>& pieces) {
-	std::string layoutPath = getPathToSaveFiles() + "/piece_layouts/" + pictureId + ".layout";
-	std::ifstream file(layoutPath);
-	if (!file.is_open()) {
+	std::string layoutPath = "piece_layouts/" + pictureId + ".layout";
+
+	if (!sago::FileExists(layoutPath.c_str())) {
 		return false;
 	}
+
 	pieces.clear();
+	std::string content = sago::GetFileContent(layoutPath);
+	std::istringstream iss(content);
+
 	int numPieces;
-	file >> numPieces;
+	iss >> numPieces;
 	for (int i = 0; i < numPieces; ++i) {
 		SDL_Rect piece;
-		file >> piece.x >> piece.y >> piece.w >> piece.h;
+		iss >> piece.x >> piece.y >> piece.w >> piece.h;
 		pieces.push_back(piece);
 	}
-	file.close();
+
 	return !pieces.empty();
 }
 
 bool SaveCustomPieceLayout(const std::string& pictureId, const std::vector<SDL_Rect>& pieces) {
-	std::string savePath = getPathToSaveFiles() + "/piece_layouts";
-	OsCreateFolder(savePath);
+	std::string layoutPath = "piece_layouts/" + pictureId + ".layout";
+	std::ostringstream oss;
 
-	std::string layoutPath = savePath + "/" + pictureId + ".layout";
-	std::ofstream file(layoutPath);
-
-	if (!file.is_open()) {
-		return false;
-	}
-
-	file << pieces.size() << std::endl;
+	oss << pieces.size() << "\n";
 	for (const SDL_Rect& piece : pieces) {
-		file << piece.x << " " << piece.y << " " << piece.w << " " << piece.h << std::endl;
+		oss << piece.x << " " << piece.y << " " << piece.w << " " << piece.h << "\n";
 	}
 
-	file.close();
+	sago::WriteFileContent(layoutPath.c_str(), oss.str());
 	return true;
 }
 
 bool HasCustomPieceLayout(const std::string& pictureId) {
-	std::string layoutPath = getPathToSaveFiles() + "/piece_layouts/" + pictureId + ".layout";
-	std::ifstream file(layoutPath);
-	return file.is_open();
+	std::string layoutPath = "piece_layouts/" + pictureId + ".layout";
+	return sago::FileExists(layoutPath.c_str());
 }
