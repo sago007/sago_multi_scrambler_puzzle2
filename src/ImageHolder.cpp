@@ -23,6 +23,8 @@ https://github.com/sago007/saland
 
 #include "ImageHolder.hpp"
 #include <SDL_image.h>
+#include "sago/SagoMisc.hpp"
+#include <memory>
 
 ImageHolder::ImageHolder() : pictureTex(nullptr), source_image_width(1), source_image_height(1) {}
 
@@ -32,6 +34,7 @@ ImageHolder::ImageHolder(ImageHolder&& other) {
 	source_image_height = other.source_image_height;
 	source_filename = other.source_filename;
 	do_lazy_load = other.do_lazy_load;
+	physfs_lazy_load = other.physfs_lazy_load;
 	other.pictureTex = nullptr;
 }
 
@@ -45,6 +48,7 @@ ImageHolder& ImageHolder::operator=(ImageHolder&& other) {
 		source_image_height = other.source_image_height;
 		source_filename = other.source_filename;
 		do_lazy_load = other.do_lazy_load;
+		physfs_lazy_load = other.physfs_lazy_load;
 		other.pictureTex = nullptr;
 	}
 	return *this;
@@ -80,9 +84,40 @@ void ImageHolder::LoadPictureFromFile(const std::string& filename, SDL_Renderer*
 	SDL_FreeSurface(pictureSurface);
 }
 
+void ImageHolder::LoadPictureFromPhysFS(const std::string& physfsPath, SDL_Renderer* renderer) {
+	source_filename = physfsPath;
+	std::unique_ptr<char[]> data;
+	unsigned int bytes = 0;
+	sago::ReadBytesFromFile(physfsPath.c_str(), data, bytes);
+	if (!data || bytes == 0) {
+		printf("ImageHolder::LoadPictureFromPhysFS() failed to read file: %s\n", physfsPath.c_str());
+		return;
+	}
+	SDL_RWops* rw = SDL_RWFromMem(data.get(), bytes);
+	SDL_Surface* pictureSurface = IMG_Load_RW(rw, 0);
+	SDL_RWclose(rw);
+	if (pictureSurface == nullptr) {
+		printf("ImageHolder::LoadPictureFromPhysFS() failed to load image: %s\n", physfsPath.c_str());
+		return;
+	}
+	if (pictureTex != nullptr) {
+		SDL_DestroyTexture(pictureTex);
+	}
+	pictureTex = SDL_CreateTextureFromSurface(renderer, pictureSurface);
+	source_image_width = pictureSurface->w;
+	source_image_height = pictureSurface->h;
+	SDL_FreeSurface(pictureSurface);
+}
+
 void ImageHolder::LoadPictureFromFileLazy(const std::string& filename) {
 	source_filename = filename;
 	do_lazy_load = true;
+}
+
+void ImageHolder::LoadPictureFromPhysFSLazy(const std::string& physfsPath) {
+	source_filename = physfsPath;
+	do_lazy_load = true;
+	physfs_lazy_load = true;
 }
 
 
@@ -102,8 +137,13 @@ void ImageHolder::Draw(SDL_Renderer* target, int x, int y, int max_w, int max_h)
 	if (do_lazy_load) {
 		printf("Lazy loading image: %s\n", source_filename.c_str());
 		std::string filename = source_filename;
-		LoadPictureFromFile(filename, target);
+		if (physfs_lazy_load) {
+			LoadPictureFromPhysFS(filename, target);
+		} else {
+			LoadPictureFromFile(filename, target);
+		}
 		do_lazy_load = false;
+		physfs_lazy_load = false;
 	}
 	if (pictureTex == nullptr) {
 		//printf("ImageHolder::Draw() called with no image loaded. Filename: %s\n", source_filename.c_str());

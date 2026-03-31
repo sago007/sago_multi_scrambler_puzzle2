@@ -30,7 +30,6 @@ https://github.com/sago007/saland
 #include "SagoImGui.hpp"
 #include "nlohmann/json.hpp"
 #include <iostream>
-#include <physfs.h>
 
 CollectionPlayState::CollectionPlayState(const std::string& collectionDir)
 	: collectionDir(collectionDir) {
@@ -204,13 +203,13 @@ void CollectionPlayState::Update() {
 
 		if (currentPuzzleIndex >= 0 && currentPuzzleIndex < static_cast<int>(puzzles.size())) {
 			const CollectionPuzzleInfo& puzzle = puzzles[currentPuzzleIndex];
-			std::string imagePath = GetImageFilesystemPath(puzzle.image);
+			std::string imagePath = GetImagePhysFSPath(puzzle.image);
 
 			if (!imagePath.empty()) {
 				PuzzleSingleImageState psi;
 				psi.flipMode = puzzle.flip_mode;
 				psi.rectangularMode = puzzle.rectangular_mode;
-				psi.LoadPictureFromFile(imagePath, globalData.screen);
+				psi.LoadPictureFromPhysFS(imagePath, globalData.screen);
 				RunGameState(psi);
 				globalData.mouseUp = true;
 
@@ -280,22 +279,17 @@ void CollectionPlayState::LoadCollection() {
 
 void CollectionPlayState::LoadCurrentImage() {
 	if (currentPuzzleIndex >= 0 && currentPuzzleIndex < static_cast<int>(puzzles.size())) {
-		std::string imagePath = GetImageFilesystemPath(puzzles[currentPuzzleIndex].image);
+		std::string imagePath = GetImagePhysFSPath(puzzles[currentPuzzleIndex].image);
 		ImageHolder newHolder;
 		if (!imagePath.empty()) {
-			newHolder.LoadPictureFromFileLazy(imagePath);
+			newHolder.LoadPictureFromPhysFSLazy(imagePath);
 		}
 		currentImageHolder = std::move(newHolder);
 	}
 }
 
-std::string CollectionPlayState::GetImageFilesystemPath(const std::string& imageFilename) const {
-	std::string physfsPath = "collections/" + collectionDir + "/" + imageFilename;
-	const char* realDir = PHYSFS_getRealDir(physfsPath.c_str());
-	if (realDir) {
-		return std::string(realDir) + "/" + physfsPath;
-	}
-	return "";
+std::string CollectionPlayState::GetImagePhysFSPath(const std::string& imageFilename) const {
+	return "collections/" + collectionDir + "/" + imageFilename;
 }
 
 int CollectionPlayState::FindFirstUnsolved() const {

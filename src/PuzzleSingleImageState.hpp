@@ -40,6 +40,7 @@ public:
 	void Update() override;
 
 	void LoadPictureFromFile(const std::string& filename, SDL_Renderer* renderer);
+	void LoadPictureFromPhysFS(const std::string& physfsPath, SDL_Renderer* renderer);
 
 	bool IsSolved() const { return puzzleSolved; }
 

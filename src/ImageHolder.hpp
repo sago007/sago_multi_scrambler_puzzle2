@@ -49,7 +49,9 @@ public:
 
 	// Other member functions and variables
 	void LoadPictureFromFile(const std::string& filename, SDL_Renderer* renderer);
+	void LoadPictureFromPhysFS(const std::string& physfsPath, SDL_Renderer* renderer);
 	void LoadPictureFromFileLazy(const std::string& filename);
+	void LoadPictureFromPhysFSLazy(const std::string& physfsPath);
 	int GetWidth() const;
 	int GetHeight() const;
 	SDL_Texture* GetTexture() const;
@@ -70,6 +72,7 @@ private:
 	// Private member variables
 	SDL_Texture* pictureTex = NULL;
 	bool do_lazy_load = false;
+	bool physfs_lazy_load = false;
 	int source_image_height = 1;
 	int source_image_width = 1;
 	std::string source_filename;

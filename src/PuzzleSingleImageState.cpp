@@ -28,8 +28,10 @@ https://github.com/sago007/saland
 #include "globals.hpp"
 #include <SDL2/SDL2_gfxPrimitives.h>
 #include <time.h>
+#include <memory>
 #include <filesystem>
 #include "SagoImGui.hpp"
+#include "sago/SagoMisc.hpp"
 #include "rhash.hpp"
 #include "config.hpp"
 #include "sago_common.hpp"
@@ -342,6 +344,60 @@ void PuzzleSingleImageState::LoadPictureFromFile(const std::string& filename, SD
 	}
 	else {
 		// Use the original splitting algorithm
+		SDL_Rect piece;
+		piece.x = 0;
+		piece.y = 0;
+		piece.h = resized_image_logical_height;
+		piece.w = resized_image_logical_width;
+		pieces_logical.push_back(piece);
+		for (int i = 0; i<10; ++i) {
+			SplitPiece();
+		}
+	}
+
+	ResizeImagePhysical();
+	Shuffle();
+}
+
+void PuzzleSingleImageState::LoadPictureFromPhysFS(const std::string& physfsPath, SDL_Renderer* renderer) {
+	ClearPicture();
+	imageFilePath = physfsPath;
+	IMG_Init(IMG_INIT_JPG|IMG_INIT_PNG);
+	std::unique_ptr<char[]> data;
+	unsigned int bytes = 0;
+	sago::ReadBytesFromFile(physfsPath.c_str(), data, bytes);
+	if (!data || bytes == 0) {
+		std::cerr << "Failed to read " << physfsPath << " from PhysFS" << std::endl;
+		return;
+	}
+	SDL_RWops* rw = SDL_RWFromMem(data.get(), bytes);
+	SDL_Surface* bitmapSurface = IMG_Load_RW(rw, 0);
+	SDL_RWclose(rw);
+	if (!bitmapSurface) {
+		std::cerr << "Failed to load " << physfsPath << std::endl;
+		return;
+	}
+	RHash h(RHASH_SHA256);
+	h.update(physfsPath);
+	picture_id = h.hex(RHASH_SHA256);
+	source_image_height = bitmapSurface->h;
+	source_image_width = bitmapSurface->w;
+	ResizeImage();
+	this->pictureTex = SDL_CreateTextureFromSurface(renderer, bitmapSurface);
+	std::cerr << resized_image_logical_width << ", " << resized_image_logical_height << ", id: " << picture_id << ", file: " << physfsPath << "\n";
+	SDL_FreeSurface(bitmapSurface);
+	SDL_SetTextureBlendMode(this->pictureTex, SDL_BLENDMODE_BLEND);
+	pieces_logical.clear();
+
+	if (rectangularMode) {
+		if (!LoadCustomPieceLayout(picture_id, pieces_logical)) {
+			CreateRectangularPieces(4, 4);
+		}
+		else {
+			std::cerr << "Loaded custom piece layout with " << pieces_logical.size() << " pieces\n";
+		}
+	}
+	else {
 		SDL_Rect piece;
 		piece.x = 0;
 		piece.y = 0;

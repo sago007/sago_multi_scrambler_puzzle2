@@ -52,7 +52,7 @@ public:
 private:
 	void LoadCollection();
 	void LoadCurrentImage();
-	std::string GetImageFilesystemPath(const std::string& imageFilename) const;
+	std::string GetImagePhysFSPath(const std::string& imageFilename) const;
 	int FindFirstUnsolved() const;
 
 	bool isActive = true;
