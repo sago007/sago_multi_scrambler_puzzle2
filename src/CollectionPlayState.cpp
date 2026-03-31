@@ -39,6 +39,13 @@ CollectionPlayState::CollectionPlayState(const std::string& collectionDir)
 	int firstUnsolved = FindFirstUnsolved();
 	currentPuzzleIndex = (firstUnsolved >= 0) ? firstUnsolved : 0;
 	LoadCurrentImage();
+
+	questionMarkField.SetHolder(globalData.dataHolder);
+	questionMarkField.SetFont("freeserif");
+	questionMarkField.SetColor({200, 200, 200, 255});
+	questionMarkField.SetFontSize(120);
+	questionMarkField.SetOutline(3, {80, 80, 80, 255});
+	questionMarkField.SetText("?");
 }
 
 CollectionPlayState::~CollectionPlayState() {
@@ -76,10 +83,21 @@ void CollectionPlayState::Draw(SDL_Renderer* target) {
 	int preview_y = 60;
 	int preview_max_w = globalData.xsize / 2 - 60;
 	int preview_max_h = globalData.ysize - 120;
-	currentImageHolder.Draw(target, preview_x, preview_y, preview_max_w, preview_max_h);
 
 	// Draw solved indicator using sprites
 	bool isSolved = solvedPuzzles.count(currentPuzzleIndex) > 0;
+
+	if (isSolved) {
+		currentImageHolder.Draw(target, preview_x, preview_y, preview_max_w, preview_max_h);
+	} else {
+		// Draw a large [?] centered in the preview area
+		int center_x = preview_x + preview_max_w / 2;
+		int center_y = preview_y + preview_max_h / 2;
+		questionMarkField.Draw(target, center_x, center_y,
+		                       sago::SagoTextField::Alignment::center,
+		                       sago::SagoTextField::VerticalAlignment::center);
+	}
+
 	int icon_x = preview_x + preview_max_w - 40;
 	int icon_y = preview_y + 10;
 	const sago::SagoSprite& checkbox = globalData.spriteHolder->GetSprite("i_level_check_box");

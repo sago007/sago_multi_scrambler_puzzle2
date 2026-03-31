@@ -68,4 +68,5 @@ private:
 	sago::SagoTextField titleField;
 	sago::SagoTextField descriptionField;
 	sago::SagoTextField progressField;
+	sago::SagoTextField questionMarkField;
 };
