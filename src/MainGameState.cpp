@@ -29,6 +29,7 @@ https://github.com/sago007/saland
 #include "SagoImGui.hpp"
 #include "config.hpp"
 #include "PuzzleSingleImageState.hpp"
+#include "CollectionListState.hpp"
 #include "sago_common.hpp"
 
 MainGameState::MainGameState() {
@@ -65,6 +66,10 @@ void MainGameState::Draw(SDL_Renderer* target) {
 	ImGui::SetNextWindowPos(ImVec2(globalData.xsize / 2.0f, globalData.ysize / 2.0f), ImGuiCond_Always, ImVec2(0.5f, 0.5f));
 	ImGui::Begin("Main Menu", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove);
 
+	if (ImGui::Button("Collections", ImVec2(300, 50))) {
+		shouldOpenCollections = true;
+	}
+
 	if (ImGui::Button("Random image from favorites", ImVec2(300, 50))) {
 		shouldLoadRandomFavorite = true;
 	}
@@ -81,6 +86,12 @@ void MainGameState::Update() {
 	if (shouldLoadRandomFavorite) {
 		shouldLoadRandomFavorite = false;
 		LoadRandomFavorite();
+	}
+	if (shouldOpenCollections) {
+		shouldOpenCollections = false;
+		CollectionListState cls;
+		RunGameState(cls);
+		globalData.mouseUp = true;
 	}
 }
 

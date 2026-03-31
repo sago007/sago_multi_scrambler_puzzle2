@@ -33,6 +33,7 @@ https://github.com/sago007/saland
 #include "ImageSelectState.hpp"
 #include "sago_common.hpp"
 #include "MainGameState.hpp"
+#include "CollectionPlayState.hpp"
 #include "editor/SagoTextureSelector.hpp"
 #include "version.h"
 #include "os.hpp"
@@ -60,9 +61,8 @@ void runGame() {
 
 void runCollection(const std::string& collection_name) {
 	InitGame();
-	ImageSelectState iss;
-	iss.collection = collection_name;
-	RunGameState(iss);
+	CollectionPlayState cps(collection_name);
+	RunGameState(cps);
 	UninitGame();
 }
 

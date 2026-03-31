@@ -1,0 +1,48 @@
+{
+	"name": "Fairy Tales",
+	"description": "Classic fairy tale illustrations by Elizabeth Tyler Wolcott (1892-1952). Public domain artwork.",
+	"puzzles": [
+		{
+			"image": "Cinderella (1918).jpg",
+			"title": "Cinderella",
+			"description": "Cinderella at the ball, illustrated in 1918.",
+			"flip_mode": false,
+			"rectangular_mode": false
+		},
+		{
+			"image": "Little Red Riding Hood (1919).jpg",
+			"title": "Little Red Riding Hood",
+			"description": "Little Red Riding Hood meets the wolf, illustrated in 1919.",
+			"flip_mode": false,
+			"rectangular_mode": false
+		},
+		{
+			"image": "The Three Bears (1918).jpg",
+			"title": "The Three Bears",
+			"description": "Goldilocks and the Three Bears, illustrated in 1918.",
+			"flip_mode": false,
+			"rectangular_mode": false
+		},
+		{
+			"image": "Snow White And The Seven Dwarfs (1920).jpg",
+			"title": "Snow White and the Seven Dwarfs",
+			"description": "Snow White with the seven dwarfs, illustrated in 1920.",
+			"flip_mode": false,
+			"rectangular_mode": false
+		},
+		{
+			"image": "The Three Little Pigs (1920).jpg",
+			"title": "The Three Little Pigs",
+			"description": "The Three Little Pigs and the Big Bad Wolf, illustrated in 1920.",
+			"flip_mode": false,
+			"rectangular_mode": false
+		},
+		{
+			"image": "Puss In Boots (1921).jpg",
+			"title": "Puss in Boots",
+			"description": "The clever cat Puss in Boots, illustrated in 1921.",
+			"flip_mode": false,
+			"rectangular_mode": false
+		}
+	]
+}

@@ -35,6 +35,21 @@ ImageHolder::ImageHolder(ImageHolder&& other) {
 	other.pictureTex = nullptr;
 }
 
+ImageHolder& ImageHolder::operator=(ImageHolder&& other) {
+	if (this != &other) {
+		if (pictureTex != nullptr) {
+			SDL_DestroyTexture(pictureTex);
+		}
+		pictureTex = other.pictureTex;
+		source_image_width = other.source_image_width;
+		source_image_height = other.source_image_height;
+		source_filename = other.source_filename;
+		do_lazy_load = other.do_lazy_load;
+		other.pictureTex = nullptr;
+	}
+	return *this;
+}
+
 ImageHolder::~ImageHolder() {
 	if (pictureTex != nullptr) {
 		SDL_DestroyTexture(pictureTex);

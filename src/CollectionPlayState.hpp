@@ -1,7 +1,7 @@
 /*
 ===========================================================================
  * Sago Multi Scrambler Puzzle
-Copyright (C) 2022 Poul Sander
+Copyright (C) 2022-2026 Poul Sander
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,16 +21,28 @@ https://github.com/sago007/saland
 ===========================================================================
 */
 
+#pragma once
+
 #include "sago/GameStateInterface.hpp"
+#include "ImageHolder.hpp"
+#include "sago/SagoTextField.hpp"
+#include <string>
+#include <vector>
+#include <set>
 
-#ifndef MAINGAMESTATE_HPP
-#define MAINGAMESTATE_HPP
+struct CollectionPuzzleInfo {
+	std::string image;
+	std::string title;
+	std::string description;
+	bool flip_mode = false;
+	bool rectangular_mode = false;
+};
 
-class MainGameState : public sago::GameStateInterface {
+class CollectionPlayState : public sago::GameStateInterface {
 public:
-	MainGameState();
-	MainGameState(const MainGameState& orig) = delete;
-	virtual ~MainGameState();
+	CollectionPlayState(const std::string& collectionDir);
+	CollectionPlayState(const CollectionPlayState& orig) = delete;
+	virtual ~CollectionPlayState();
 
 	bool IsActive() override;
 	void ProcessInput(const SDL_Event& event, bool& processed) override;
@@ -38,14 +50,22 @@ public:
 	void Update() override;
 
 private:
+	void LoadCollection();
+	void LoadCurrentImage();
+	std::string GetImageFilesystemPath(const std::string& imageFilename) const;
+	int FindFirstUnsolved() const;
+
 	bool isActive = true;
-	bool shouldLoadRandomFavorite = false;
-	bool shouldOpenCollections = false;
-	void LoadRandomFavorite();
+	std::string collectionDir;
+	std::string collectionName;
+	std::string collectionDescription;
+	std::vector<CollectionPuzzleInfo> puzzles;
+	std::set<int> solvedPuzzles;
+	int currentPuzzleIndex = 0;
+	bool shouldPlayPuzzle = false;
+
+	ImageHolder currentImageHolder;
+	sago::SagoTextField titleField;
+	sago::SagoTextField descriptionField;
+	sago::SagoTextField progressField;
 };
-
-void DrawRectWhite(SDL_Renderer* target, int topx, int topy, int height, int width);
-void DrawRectYellow(SDL_Renderer* target, int topx, int topy, int height, int width);
-
-#endif /* MAINGAMESTATE_HPP */
-

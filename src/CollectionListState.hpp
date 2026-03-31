@@ -1,7 +1,7 @@
 /*
 ===========================================================================
  * Sago Multi Scrambler Puzzle
-Copyright (C) 2022 Poul Sander
+Copyright (C) 2022-2026 Poul Sander
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,16 +21,24 @@ https://github.com/sago007/saland
 ===========================================================================
 */
 
+#pragma once
+
 #include "sago/GameStateInterface.hpp"
+#include <string>
+#include <vector>
 
-#ifndef MAINGAMESTATE_HPP
-#define MAINGAMESTATE_HPP
+struct CollectionInfo {
+	std::string dirName;
+	std::string displayName;
+	std::string description;
+	int puzzleCount = 0;
+};
 
-class MainGameState : public sago::GameStateInterface {
+class CollectionListState : public sago::GameStateInterface {
 public:
-	MainGameState();
-	MainGameState(const MainGameState& orig) = delete;
-	virtual ~MainGameState();
+	CollectionListState();
+	CollectionListState(const CollectionListState& orig) = delete;
+	virtual ~CollectionListState();
 
 	bool IsActive() override;
 	void ProcessInput(const SDL_Event& event, bool& processed) override;
@@ -38,14 +46,8 @@ public:
 	void Update() override;
 
 private:
+	void DiscoverCollections();
 	bool isActive = true;
-	bool shouldLoadRandomFavorite = false;
-	bool shouldOpenCollections = false;
-	void LoadRandomFavorite();
+	std::vector<CollectionInfo> collections;
+	int selectedCollection = -1;
 };
-
-void DrawRectWhite(SDL_Renderer* target, int topx, int topy, int height, int width);
-void DrawRectYellow(SDL_Renderer* target, int topx, int topy, int height, int width);
-
-#endif /* MAINGAMESTATE_HPP */
-

@@ -41,6 +41,8 @@ public:
 
 	void LoadPictureFromFile(const std::string& filename, SDL_Renderer* renderer);
 
+	bool IsSolved() const { return puzzleSolved; }
+
 	void SplitPiece();
 	void SplitPiece(size_t piece_number);
 	void SplitPieceVertical(size_t piece_number);

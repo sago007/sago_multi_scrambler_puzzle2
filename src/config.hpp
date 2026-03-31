@@ -28,6 +28,7 @@ SOFTWARE.
 #include <string>
 #include <map>
 #include <vector>
+#include <set>
 #include "SDL.h"
 
 /**
@@ -146,5 +147,27 @@ bool SaveCustomPieceLayout(const std::string& pictureId, const std::vector<SDL_R
  * @return true if custom layout exists, false otherwise
  */
 bool HasCustomPieceLayout(const std::string& pictureId);
+
+/**
+ * @brief Loads collection progress (set of solved puzzle indices)
+ * @param collectionName The collection directory name
+ * @return Set of solved puzzle indices
+ */
+std::set<int> LoadCollectionProgress(const std::string& collectionName);
+
+/**
+ * @brief Marks a puzzle as solved in a collection
+ * @param collectionName The collection directory name
+ * @param puzzleIndex The puzzle index to mark as solved
+ */
+void MarkCollectionPuzzleSolved(const std::string& collectionName, int puzzleIndex);
+
+/**
+ * @brief Checks if a puzzle in a collection has been solved
+ * @param collectionName The collection directory name
+ * @param puzzleIndex The puzzle index to check
+ * @return true if the puzzle has been solved
+ */
+bool IsCollectionPuzzleSolved(const std::string& collectionName, int puzzleIndex);
 
 #endif // CONFIG_HPP

@@ -41,6 +41,9 @@ public:
 	// Move constructor
 	ImageHolder(ImageHolder&& other);
 
+	// Move assignment operator
+	ImageHolder& operator=(ImageHolder&& other);
+
 	// Destructor
 	~ImageHolder();
 

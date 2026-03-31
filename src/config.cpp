@@ -26,6 +26,7 @@ SOFTWARE.
 #include "os.hpp"
 #include "sago/SagoMisc.hpp"
 #include <vector>
+#include <set>
 #include <sstream>
 
 std::map<std::string, std::string> LoadConfigMap() {
@@ -216,4 +217,34 @@ bool SaveCustomPieceLayout(const std::string& pictureId, const std::vector<SDL_R
 bool HasCustomPieceLayout(const std::string& pictureId) {
 	std::string layoutPath = "piece_layouts/" + pictureId + ".layout";
 	return sago::FileExists(layoutPath.c_str());
+}
+
+std::set<int> LoadCollectionProgress(const std::string& collectionName) {
+	std::set<int> solved;
+	std::string progressPath = "collection_progress/" + collectionName + ".txt";
+	if (sago::FileExists(progressPath.c_str())) {
+		std::string content = sago::GetFileContent(progressPath);
+		std::istringstream iss(content);
+		int index;
+		while (iss >> index) {
+			solved.insert(index);
+		}
+	}
+	return solved;
+}
+
+void MarkCollectionPuzzleSolved(const std::string& collectionName, int puzzleIndex) {
+	std::set<int> solved = LoadCollectionProgress(collectionName);
+	solved.insert(puzzleIndex);
+	std::string progressPath = "collection_progress/" + collectionName + ".txt";
+	std::ostringstream oss;
+	for (int idx : solved) {
+		oss << idx << "\n";
+	}
+	sago::WriteFileContent(progressPath.c_str(), oss.str());
+}
+
+bool IsCollectionPuzzleSolved(const std::string& collectionName, int puzzleIndex) {
+	std::set<int> solved = LoadCollectionProgress(collectionName);
+	return solved.count(puzzleIndex) > 0;
 }
