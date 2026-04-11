@@ -149,16 +149,16 @@ void MainGameState::Draw(SDL_Renderer* target) {
 	// Draw rotating image pieces as background decoration
 	if (backgroundTex && !bg_pieces_logical.empty()) {
 		size_t N = bg_pieces_logical.size();
-		double base_angle = SDL_GetTicks() * 0.0005;
+		double base_angle = SDL_GetTicks() * 0.0002;
 		int centerX = globalData.xsize / 2;
 		int centerY = globalData.ysize / 2;
-		int radius = std::min(globalData.xsize, globalData.ysize) / 4;
+		int radius = std::min(globalData.xsize, globalData.ysize) / 2.4;
 
 		// Compute a display scale so pieces fit nicely on screen
-		double display_scale = double(std::min(globalData.xsize, globalData.ysize)) / double(bg_logical_height) * 0.25;
+		double display_scale = double(std::min(globalData.xsize, globalData.ysize)) / double(bg_logical_height) * 0.4;
 		double source_scale = double(bg_source_height) / double(bg_logical_height);
 
-		SDL_SetTextureAlphaMod(backgroundTex, 180);
+		SDL_SetTextureAlphaMod(backgroundTex, 255);
 		for (size_t i = 0; i < N; ++i) {
 			double angle = base_angle + (2.0 * M_PI * i / N);
 			int px = centerX + static_cast<int>(radius * cos(angle));
