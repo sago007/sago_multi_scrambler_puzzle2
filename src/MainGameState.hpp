@@ -22,6 +22,7 @@ https://github.com/sago007/saland
 */
 
 #include "sago/GameStateInterface.hpp"
+#include <vector>
 
 #ifndef MAINGAMESTATE_HPP
 #define MAINGAMESTATE_HPP
@@ -42,6 +43,15 @@ private:
 	bool shouldLoadRandomFavorite = false;
 	bool shouldOpenCollections = false;
 	void LoadRandomFavorite();
+	void InitBackgroundPieces();
+
+	bool bg_initialized = false;
+	SDL_Texture* backgroundTex = nullptr;
+	std::vector<SDL_Rect> bg_pieces_logical;
+	int bg_source_width = 1;
+	int bg_source_height = 1;
+	int bg_logical_width = 1;
+	int bg_logical_height = 1;
 };
 
 void DrawRectWhite(SDL_Renderer* target, int topx, int topy, int height, int width);

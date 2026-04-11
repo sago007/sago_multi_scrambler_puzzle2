@@ -25,18 +25,111 @@ https://github.com/sago007/saland
 #include <string>
 #include <random>
 #include <iostream>
+#include <cmath>
 #include "globals.hpp"
 #include "SagoImGui.hpp"
 #include "config.hpp"
 #include "PuzzleSingleImageState.hpp"
 #include "CollectionListState.hpp"
 #include "sago_common.hpp"
+#include "sago/SagoMisc.hpp"
+#include "SDL_image.h"
 
 MainGameState::MainGameState() {
 }
 
 
 MainGameState::~MainGameState() {
+	if (backgroundTex) {
+		SDL_DestroyTexture(backgroundTex);
+		backgroundTex = nullptr;
+	}
+}
+
+static void SplitPieceVertical(std::vector<SDL_Rect>& pieces, size_t piece_number, int min_piece_size) {
+	SDL_Rect piece1 = pieces.at(piece_number);
+	if (piece1.w > 2 * min_piece_size) {
+		int new_piece_width = min_piece_size + (rand() % (piece1.w - 2 * min_piece_size));
+		SDL_Rect piece2 = piece1;
+		piece2.w = new_piece_width;
+		piece1.w -= new_piece_width;
+		piece2.x = piece2.x + piece1.w;
+		pieces.at(piece_number) = piece1;
+		pieces.push_back(piece2);
+	}
+}
+
+static void SplitPieceHorisontal(std::vector<SDL_Rect>& pieces, size_t piece_number, int min_piece_size) {
+	SDL_Rect piece1 = pieces.at(piece_number);
+	if (piece1.h > 2 * min_piece_size) {
+		int new_piece_height = min_piece_size + (rand() % (piece1.h - 2 * min_piece_size));
+		SDL_Rect piece2 = piece1;
+		piece2.h = new_piece_height;
+		piece1.h -= new_piece_height;
+		piece2.y = piece2.y + piece1.h;
+		pieces.at(piece_number) = piece1;
+		pieces.push_back(piece2);
+	}
+}
+
+void MainGameState::InitBackgroundPieces() {
+	IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG);
+	std::unique_ptr<char[]> data;
+	unsigned int bytes = 0;
+	sago::ReadBytesFromFile("collections/fairy_tales/Little Red Riding Hood (1919).jpg", data, bytes);
+	if (!data || bytes == 0) {
+		std::cerr << "Failed to load background image from PhysFS" << std::endl;
+		return;
+	}
+	SDL_RWops* rw = SDL_RWFromMem(data.get(), bytes);
+	SDL_Surface* surface = IMG_Load_RW(rw, 0);
+	SDL_RWclose(rw);
+	if (!surface) {
+		std::cerr << "Failed to decode background image" << std::endl;
+		return;
+	}
+	bg_source_width = surface->w;
+	bg_source_height = surface->h;
+	backgroundTex = SDL_CreateTextureFromSurface(globalData.screen, surface);
+	SDL_FreeSurface(surface);
+	SDL_SetTextureBlendMode(backgroundTex, SDL_BLENDMODE_BLEND);
+
+	// Compute logical dimensions (max 700h x 1100w, maintaining aspect ratio)
+	const int max_logical_height = 700;
+	const int max_logical_width = 1100;
+	bg_logical_height = max_logical_height;
+	bg_logical_width = static_cast<int>(double(bg_logical_height) * (double(bg_source_width) / double(bg_source_height)));
+	if (bg_logical_width > max_logical_width) {
+		bg_logical_width = max_logical_width;
+		bg_logical_height = static_cast<int>(double(bg_logical_width) * (double(bg_source_height) / double(bg_source_width)));
+	}
+
+	// Start with single piece covering the whole image
+	SDL_Rect piece;
+	piece.x = 0;
+	piece.y = 0;
+	piece.w = bg_logical_width;
+	piece.h = bg_logical_height;
+	bg_pieces_logical.push_back(piece);
+
+	// Split into ~8-12 pieces
+	srand(static_cast<unsigned>(time(nullptr)));
+	const int min_piece_size = 120;
+	for (int iter = 0; iter < 6; ++iter) {
+		size_t count = bg_pieces_logical.size();
+		for (size_t i = 0; i < count; ++i) {
+			const SDL_Rect& p = bg_pieces_logical[i];
+			if (p.w > 2 * min_piece_size || p.h > 2 * min_piece_size) {
+				if (rand() % 2 == 1) {
+					SplitPieceVertical(bg_pieces_logical, i, min_piece_size);
+					SplitPieceHorisontal(bg_pieces_logical, i, min_piece_size);
+				} else {
+					SplitPieceHorisontal(bg_pieces_logical, i, min_piece_size);
+					SplitPieceVertical(bg_pieces_logical, i, min_piece_size);
+				}
+			}
+		}
+	}
 }
 
 bool MainGameState::IsActive() {
@@ -48,6 +141,50 @@ void MainGameState::ProcessInput(const SDL_Event& event, bool& processed) {
 }
 
 void MainGameState::Draw(SDL_Renderer* target) {
+	if (!bg_initialized) {
+		bg_initialized = true;
+		InitBackgroundPieces();
+	}
+
+	// Draw rotating image pieces as background decoration
+	if (backgroundTex && !bg_pieces_logical.empty()) {
+		size_t N = bg_pieces_logical.size();
+		double base_angle = SDL_GetTicks() * 0.0005;
+		int centerX = globalData.xsize / 2;
+		int centerY = globalData.ysize / 2;
+		int radius = std::min(globalData.xsize, globalData.ysize) / 4;
+
+		// Compute a display scale so pieces fit nicely on screen
+		double display_scale = double(std::min(globalData.xsize, globalData.ysize)) / double(bg_logical_height) * 0.25;
+		double source_scale = double(bg_source_height) / double(bg_logical_height);
+
+		SDL_SetTextureAlphaMod(backgroundTex, 180);
+		for (size_t i = 0; i < N; ++i) {
+			double angle = base_angle + (2.0 * M_PI * i / N);
+			int px = centerX + static_cast<int>(radius * cos(angle));
+			int py = centerY + static_cast<int>(radius * sin(angle));
+
+			const SDL_Rect& lp = bg_pieces_logical[i];
+
+			// Source rect in original image coordinates
+			SDL_Rect src;
+			src.x = static_cast<int>(lp.x * source_scale);
+			src.y = static_cast<int>(lp.y * source_scale);
+			src.w = static_cast<int>(lp.w * source_scale);
+			src.h = static_cast<int>(lp.h * source_scale);
+
+			// Destination rect centered at orbit position
+			SDL_Rect dst;
+			dst.w = static_cast<int>(lp.w * display_scale);
+			dst.h = static_cast<int>(lp.h * display_scale);
+			dst.x = px - dst.w / 2;
+			dst.y = py - dst.h / 2;
+
+			SDL_RenderCopy(target, backgroundTex, &src, &dst);
+		}
+		SDL_SetTextureAlphaMod(backgroundTex, 255);
+	}
+
 	DrawRectYellow(target, 5, 5, 200, 200);
 
 	ImGui::BeginMainMenuBar();
