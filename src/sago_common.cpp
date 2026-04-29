@@ -35,6 +35,7 @@ https://github.com/sago007/saland
 void InitSagoFS(int argc, const char* argv[]) {
 	PHYSFS_init(argv[0]);
 	PHYSFS_mount((std::string(PHYSFS_getBaseDir())+"/data").c_str(), nullptr, 0);
+	PHYSFS_mount("./data", nullptr, 0);
 	PHYSFS_mount(getPathToSaveFiles().c_str(), nullptr, 0);
 	OsCreateSaveFolder();
 	PHYSFS_setWriteDir(getPathToSaveFiles().c_str());
