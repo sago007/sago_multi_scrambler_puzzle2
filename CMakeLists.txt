@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.10.2..3.31.6)
 project (sago_multi_scrambler_puzzle2)
+include(GNUInstallDirs)
 find_package(Boost COMPONENTS program_options REQUIRED NO_MODULE)
 
 option(USE_EMBEDDED_PLATFORM_FOLDERS "Use the embedded version of PlatformFolders" ON)
@@ -38,3 +39,14 @@ TARGET_LINK_LIBRARIES( sago_multi_scrambler_puzzle2 ${Boost_LIBRARIES} )
 target_link_libraries( sago_multi_scrambler_puzzle2 ${SDL2_LIBRARIES})
 target_link_libraries( sago_multi_scrambler_puzzle2 physfs platform_folders rhash)
 target_link_libraries( sago_multi_scrambler_puzzle2 ${SDL2MIXER_LIBRARIES} ${SDL2IMAGE_LIBRARIES} ${SDL2TTF_LIBRARIES} ${SDL2GFX_LIBRARIES})
+target_compile_definitions(sago_multi_scrambler_puzzle2 PRIVATE INSTALL_DATA_DIR="${CMAKE_INSTALL_FULL_DATADIR}/sago_multi_scrambler_puzzle2")
+
+configure_file(
+	extra/sago-multi-scrambler-puzzle2.desktop.in
+	${CMAKE_CURRENT_BINARY_DIR}/sago-multi-scrambler-puzzle2.desktop
+)
+
+install(TARGETS sago_multi_scrambler_puzzle2 DESTINATION ${CMAKE_INSTALL_BINDIR})
+install(DIRECTORY data/ DESTINATION ${CMAKE_INSTALL_DATADIR}/sago_multi_scrambler_puzzle2)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/sago-multi-scrambler-puzzle2.desktop DESTINATION ${CMAKE_INSTALL_DATADIR}/applications)
+install(FILES extra/sago-multi-scrambler-puzzle2.svg DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/scalable/apps)
