@@ -29,6 +29,7 @@ https://github.com/sago007/saland
 #include "sago_common.hpp"
 #include "SagoImGui.hpp"
 #include "sago/platform_folders.h"
+#include "sago/SagoMisc.hpp"
 #include "os.hpp"
 #include <iostream>
 
@@ -167,6 +168,18 @@ void InitGame() {
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
 	SDL_SetHint(SDL_HINT_MOUSE_RELATIVE_SCALING, "1");
 	win = SDL_CreateWindow(GAMENAME, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_WINDOW_RESIZABLE);
+	// Set the window icon from the bundled PNG (loaded via PhysFS)
+	{
+		std::string icon_data = sago::GetFileContent("textures/app_icon.png");
+		if (!icon_data.empty()) {
+			SDL_RWops* rw = SDL_RWFromConstMem(icon_data.data(), static_cast<int>(icon_data.size()));
+			SDL_Surface* icon_surface = IMG_Load_RW(rw, 1);
+			if (icon_surface) {
+				SDL_SetWindowIcon(win, icon_surface);
+				SDL_FreeSurface(icon_surface);
+			}
+		}
+	}
 	globalData.screen = SDL_CreateRenderer(win, -1, rendererFlags);
 	//SDL_RenderSetLogicalSize(globalData.screen, width, height);
 	InitImGui(win, globalData.screen, width, height);

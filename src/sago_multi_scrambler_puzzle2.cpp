@@ -119,11 +119,33 @@ bool installDesktopEntry() {
 	desktop_file << "Name=Sago Multi Scrambler Puzzle II\n";
 	desktop_file << "Comment=Image scrambling puzzle game\n";
 	desktop_file << "Exec=" << exe_path << " %f\n";
+	desktop_file << "Icon=sago-multi-scrambler-puzzle2\n";
 	desktop_file << "Terminal=false\n";
 	desktop_file << "Categories=Game;LogicGame;\n";
 	desktop_file << "MimeType=image/jpeg;image/png;image/jpg;\n";
 
 	desktop_file.close();
+
+	// Install SVG icon into the hicolor icon theme
+	std::string svg_source;
+	try {
+		std::filesystem::path exe_dir = std::filesystem::path(exe_path).parent_path();
+		std::filesystem::path svg_src = exe_dir / "extra" / "sago-multi-scrambler-puzzle2.svg";
+		if (std::filesystem::exists(svg_src)) {
+			std::string icon_dir = sago::getDataHome() + "/icons/hicolor/scalable/apps";
+			OsCreateFolder(icon_dir);
+			std::filesystem::path icon_dest = icon_dir + "/sago-multi-scrambler-puzzle2.svg";
+			std::filesystem::copy_file(svg_src, icon_dest, std::filesystem::copy_options::overwrite_existing);
+			std::cout << "Icon installed at: " << icon_dest.string() << "\n";
+			// Update icon cache if possible
+			std::string icon_cache_cmd = "gtk-update-icon-cache -f \"" + sago::getDataHome() + "/icons/hicolor\" 2>/dev/null";
+			system(icon_cache_cmd.c_str());
+		} else {
+			std::cout << "Note: SVG icon not found at " << svg_src.string() << ". Desktop entry will use fallback icon.\n";
+		}
+	} catch (const std::exception& e) {
+		std::cout << "Note: Could not install icon: " << e.what() << "\n";
+	}
 
 	std::cout << "Desktop entry created successfully at: " << desktop_file_path << "\n";
 

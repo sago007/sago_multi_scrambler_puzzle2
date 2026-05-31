@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Sago Multi Scrambler Puzzle II
+Comment=Image scrambling puzzle game
+Exec=/home/poul/programmering/git/sago_multi_scrambler_puzzle2/sago_multi_scrambler_puzzle2 %f
+Icon=sago-multi-scrambler-puzzle2
+Terminal=false
+Categories=Game;LogicGame;
+MimeType=image/jpeg;image/png;image/jpg;

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Clip to rounded background shape -->
+  <defs>
+    <clipPath id="bg-clip">
+      <rect width="512" height="512" rx="72" ry="72"/>
+    </clipPath>
+  </defs>
+
+  <!-- Background -->
+  <rect width="512" height="512" rx="72" ry="72" fill="#eef2f7"/>
+
+  <!-- Clipped group so scattered pieces don't overflow -->
+  <g clip-path="url(#bg-clip)">
+
+    <!-- Piece 1: Cornflower Blue, top-left -->
+    <g transform="translate(128,138) rotate(-13)">
+      <rect x="-75" y="-50" width="150" height="100" rx="5" fill="#4a90d9" stroke="#2c6ea6" stroke-width="6"/>
+    </g>
+
+    <!-- Piece 2: Amber, top-center -->
+    <g transform="translate(292,88) rotate(9)">
+      <rect x="-70" y="-45" width="140" height="90" rx="5" fill="#f5a623" stroke="#c07a0c" stroke-width="6"/>
+    </g>
+
+    <!-- Piece 3: Green, top-right -->
+    <g transform="translate(408,162) rotate(-6)">
+      <rect x="-65" y="-50" width="130" height="100" rx="5" fill="#5cb85c" stroke="#3d8b3d" stroke-width="6"/>
+    </g>
+
+    <!-- Piece 4: Yellow, mid-left -->
+    <g transform="translate(78,295) rotate(19)">
+      <rect x="-78" y="-44" width="156" height="88" rx="5" fill="#f0e040" stroke="#b8a800" stroke-width="6"/>
+    </g>
+
+    <!-- Piece 5: Red, center -->
+    <g transform="translate(268,272) rotate(-8)">
+      <rect x="-75" y="-50" width="150" height="100" rx="5" fill="#d9534f" stroke="#a52c28" stroke-width="6"/>
+    </g>
+
+    <!-- Piece 6: Purple, mid-right -->
+    <g transform="translate(428,318) rotate(6)">
+      <rect x="-65" y="-46" width="130" height="92" rx="5" fill="#9b59b6" stroke="#6c3483" stroke-width="6"/>
+    </g>
+
+    <!-- Piece 7: Teal, bottom-left -->
+    <g transform="translate(142,410) rotate(-17)">
+      <rect x="-70" y="-50" width="140" height="100" rx="5" fill="#1abc9c" stroke="#148f77" stroke-width="6"/>
+    </g>
+
+    <!-- Piece 8: Orange, bottom-right -->
+    <g transform="translate(385,428) rotate(13)">
+      <rect x="-75" y="-44" width="150" height="88" rx="5" fill="#e67e22" stroke="#b15c0e" stroke-width="6"/>
+    </g>
+
+  </g>
+
+  <!-- Subtle border -->
+  <rect width="512" height="512" rx="72" ry="72" fill="none" stroke="#c8d0da" stroke-width="8"/>
+</svg>
